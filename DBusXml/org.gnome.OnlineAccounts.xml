@@ -1,0 +1,876 @@
+<!DOCTYPE node PUBLIC
+"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+
+<!--
+ Copyright © 2014 Pranav Kant
+ Copyright © 2011 – 2017 Red Hat, Inc.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General
+ Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!-- ********************************************************************** -->
+
+  <!--
+      org.gnome.OnlineAccounts.Account:
+
+      The base account interface.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Account">
+    <!--
+        ProviderType:
+        The type of provider of the account.
+
+        This value describes how data is accessed, e.g. what API
+        applications should use. Use
+        #org.gnome.OnlineAccounts.Account:ProviderName for the name of
+        the provider (which might differ from the provider name in
+        hosted scenarios) to display in the user interface.
+    -->
+    <property name="ProviderType" type="s" access="read"/>
+
+    <!--
+        ProviderName:
+        The name of the provider to display in the user interface.
+    -->
+    <property name="ProviderName" type="s" access="read"/>
+
+    <!--
+        ProviderIcon:
+        The icon/logo of the provider.
+
+        This is a serialized <ulink
+        url="http://developer.gnome.org/gio/unstable/GIcon.html">GIcon</ulink>
+        - use e.g. <ulink
+        url="http://developer.gnome.org/gio/unstable/GIcon.html#g-icon-new-for-string">g_icon_new_for_string()</ulink>
+        to create an instance.
+    -->
+    <property name="ProviderIcon" type="s" access="read"/>
+
+    <!-- Id: An identifier for this account.
+         This identifier cannot be changed and should never be
+         displayed in any user interface.
+      -->
+    <property name="Id" type="s" access="read"/>
+
+    <!-- IsLocked:
+         @since: 3.16.0
+
+         Whether or not the user is discouraged from removing this account.
+
+         Locked accounts can be those that there added by the administrator to
+         pre-configure systems in an enterprise deployment. If %TRUE, the UI
+         should prevent, or atleast discourage, removal of these accounts.
+    -->
+    <property name="IsLocked" type="b" access="read"/>
+
+    <!-- IsTemporary:
+
+         Whether or not the account is remembered from session to session.
+
+         Temporary accounts are added implicitly when the user is granted
+         credentials from some mechanism other than Online Accounts, but that
+         Online Accounts still knows how to deal with.
+
+         They are specific to the machine/session and are silently disregarded
+         after logout.
+
+         Accounts are permanant by default unless created with "IsTemporary"
+         "true" detail.
+      -->
+    <property name="IsTemporary" type="b" access="readwrite"/>
+
+    <!-- AttentionNeeded: Set to %TRUE if the account is in need of attention.
+
+         This is used when a human operator is needed to service the
+         account (e.g. for authentication and/or authorization).
+      -->
+    <property name="AttentionNeeded" type="b" access="read"/>
+
+    <!-- Identity:
+         A string that uniquely identifies the account at the
+         provider.
+
+         Note that this may be the same string for different kinds of
+         providers (for example, if the user is using the same
+         email-address for several providers) - use
+         #org.gnome.OnlineAccounts.Account:Id to uniquely identify the
+         account.
+
+         This string might not be suitable for presentation in an user
+         interface - use
+         #org.gnome.OnlineAccounts.Account:PresentationIdentity instead.
+    -->
+    <property name="Identity" type="s" access="read"/>
+
+    <!-- PresentationIdentity:
+         Like the #org.gnome.OnlineAccounts.Account:Identity property but
+         suitable for presentation in an user interface.
+    -->
+    <property name="PresentationIdentity" type="s" access="read"/>
+
+    <!-- MailDisabled:
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Mail interface. If the account does not
+         provide email-like messaging capabilities, this property does
+         nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Mail interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="MailDisabled" type="b" access="readwrite"/>
+
+    <!-- CalendarDisabled:
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Calendar interface. If the account does not
+         provide calendar-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Calendar interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="CalendarDisabled" type="b" access="readwrite"/>
+
+    <!-- ContactsDisabled:
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Contacts interface. If the account does not
+         provide contacts-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Contacts interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="ContactsDisabled" type="b" access="readwrite"/>
+
+    <!-- ChatDisabled:
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Chat interface. If the account does not
+         provide chat-like messaging capabilities, this property does
+         nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Chat interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="ChatDisabled" type="b" access="readwrite"/>
+
+    <!-- DocumentsDisabled:
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Documents interface. If the account does not
+         provide documents-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Documents interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="DocumentsDisabled" type="b" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </property>
+
+    <!-- MapsDisabled:
+         @since: 3.14.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Maps interface. If the account does not
+         provide maps-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Maps interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="MapsDisabled" type="b" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </property>
+
+    <!-- MusicDisabled:
+         @since: 3.18.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Music interface. If the account does not
+         provide music-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Music interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="MusicDisabled" type="b" access="readwrite"/>
+
+    <!-- PrintersDisabled:
+         @since: 3.12.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Printers interface. If the account does not
+         provide printers-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Printers interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="PrintersDisabled" type="b" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </property>
+
+    <!-- PhotosDisabled:
+         @since: 3.8.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Photos interface. If the account does not
+         provide photos-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Photos interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="PhotosDisabled" type="b" access="readwrite"/>
+
+    <!-- FilesDisabled:
+         @since: 3.8.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Files interface. If the account does not
+         provide files-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Files interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="FilesDisabled" type="b" access="readwrite"/>
+
+    <!-- TicketingDisabled:
+         @since: 3.6.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Ticketing interface. If the account does not
+         provide ticketing-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Ticketing interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="TicketingDisabled" type="b" access="readwrite"/>
+
+    <!-- TodoDisabled:
+         @since: 3.26.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.Todo interface. If the account does not
+         provide todo-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.Todo interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="TodoDisabled" type="b" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </property>
+
+    <!-- ReadLaterDisabled:
+         @since: 3.12.0
+
+         If %TRUE, the account will not expose any
+         #org.gnome.OnlineAccounts.ReadLater interface. If the account does not
+         provide read-later-like capabilities, this property does nothing.
+
+         Note that the #org.gnomeOnlineAccounts.ReadLater interface is added or
+         removed from the account asynchronously.
+    -->
+    <property name="ReadLaterDisabled" type="b" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </property>
+
+    <!--
+        Remove:
+
+        Removes the account. Note that this does not removes the
+        account at the remote service.
+    -->
+    <method name="Remove"/>
+
+    <!--
+        EnsureCredentials:
+        @expires_in: The duration that the cached credentials are valid for, in seconds, or 0 if unknown.
+
+        Ensures that valid credentials exist for the account and
+        returns how long they are still valid for, if known. Returns
+        an error if the cached credentials are not valid or
+        non-existant.
+
+        If this method fails because the token service indicates that
+        authorization has expired, the
+        #org.gnome.OnlineAccounts.Account:AttentionNeeded property
+        will be set to %TRUE. On the other hand, if this property was
+        already %TRUE and this method succeeds, it is set to %FALSE.
+    -->
+    <method name="EnsureCredentials">
+      <arg name="expires_in" type="i" direction="out"/>
+    </method>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.OAuth2Based:
+
+      An account object implements this interface if <ulink
+      url="http://oauth.net/2/">OAuth 2.0</ulink> tokens are used for
+      accessing it.
+  -->
+  <interface name="org.gnome.OnlineAccounts.OAuth2Based">
+    <!--
+      GetAccessToken:
+      @access_token: The access token.
+      @expires_in: The duration that the returned token is valid for, in seconds, or 0 if unknown.
+
+      Use this method to obtain an access token that can be used to
+      access services for the account. Because networking is involved,
+      this method may take a very long time to complete.
+
+      Note that calls to this method are logged.
+    -->
+    <method name="GetAccessToken">
+      <arg name="access_token" type="s" direction="out"/>
+      <arg name="expires_in" type="i" direction="out"/>
+    </method>
+
+    <!-- ClientId: The client id. -->
+    <property name="ClientId" type="s" access="read"/>
+
+    <!-- ClientSecret: The client secret. -->
+    <property name="ClientSecret" type="s" access="read"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.OAuthBased:
+
+      An account object implements this interface if <ulink
+      url="http://oauth.net">OAuth 1.0</ulink> tokens are used for
+      accessing it.
+  -->
+  <interface name="org.gnome.OnlineAccounts.OAuthBased">
+    <!--
+      GetAccessToken:
+      @access_token: The access token.
+      @access_token_secret: The access token secret.
+      @expires_in: The duration that the returned token is valid for, in seconds, or 0 if unknown.
+
+      Use this method to obtain an access token that can be used to to
+      access services for the account. Because networking is involved,
+      this method may take a very long time to complete.
+
+      Note that calls to this method are logged.
+    -->
+    <method name="GetAccessToken">
+      <arg name="access_token" type="s" direction="out"/>
+      <arg name="access_token_secret" type="s" direction="out"/>
+      <arg name="expires_in" type="i" direction="out"/>
+    </method>
+
+    <!-- ConsumerKey: The consumer key. -->
+    <property name="ConsumerKey" type="s" access="read"/>
+
+    <!-- ConsumerSecret: The consumer secret. -->
+    <property name="ConsumerSecret" type="s" access="read"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.PasswordBased:
+      @since: 3.6.0
+
+      An account object implements this interface if one or more
+      passwords are used for accessing it.
+  -->
+  <interface name="org.gnome.OnlineAccounts.PasswordBased">
+    <!--
+      GetPassword:
+      @id: An identifier describing what password to get.
+      @password: The password.
+
+      Use this method to obtain the passwords used to access the
+      account.
+
+      If the account is for a mail account (see
+      #org.gnome.OnlineAccounts.Mail), known values for @id includes
+      <literal>imap-password</literal> and
+      <literal>smtp-password</literal>.
+
+      Note that calls to this method are logged.
+    -->
+    <method name="GetPassword">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="password" type="s" direction="out"/>
+    </method>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Manager:
+
+      An interface used for managing accounts.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Manager">
+
+    <!--
+        AddAccount:
+        @provider: The account provider. See the #org.gnome.OnlineAccounts.Account:ProviderType property for known providers.
+        @identity: The identity of the account (cf. the #org.gnome.OnlineAccounts.Account:Identity property).
+        @presentation_identity: The identity of the account that is suitable for display in an user interface (cf. the #org.gnome.OnlineAccounts.Account:PresentationIdentity property).
+        @credentials: The credentials to store.
+        @details: Extra key/value pairs to set.
+        @account_object_path: The object path of the created account.
+
+        Creates a new account. Note that this does not create an
+        account at the remote service.
+    -->
+    <method name="AddAccount">
+      <arg name="provider" type="s" direction="in"/>
+      <arg name="identity" type="s" direction="in"/>
+      <arg name="presentation_identity" type="s" direction="in"/>
+      <arg name="credentials" type="a{sv}" direction="in"/>
+      <arg name="details" type="a{ss}" direction="in"/>
+      <arg name="account_object_path" type="o" direction="out"/>
+    </method>
+
+    <!--
+        IsSupportedProvider:
+        @provider_type: A provider of online accounts
+        @is_supported: Whether the provider is supported or not
+
+        Checks if a certain type of provider of online accounts (for example,
+        "google" or "lastfm") is supported. If @provider_type is supported,
+        then @is_supported is set to %TRUE.
+
+        @since: 3.36.0
+    -->
+    <method name="IsSupportedProvider">
+      <arg name="provider_type" type="s" direction="in"/>
+      <arg name="is_supported" type="b" direction="out"/>
+    </method>
+
+  </interface>
+
+
+  <!--
+      org.gnome.OnlineAccounts.Mail:
+
+      An account object implements this interface if it provides
+      email-like messaging capabilities.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Mail">
+    <!-- EmailAddress:
+         The email address for the account or blank if there is no
+         such address or if it isnt' known or isn't in a standard
+         format.
+      -->
+    <property name="EmailAddress" type="s" access="read"/>
+
+    <!-- Name:
+         @since: 3.8.0
+         The full name of the user associated with
+         #org.gnome.OnlineAccounts.Mail:EmailAddress.
+      -->
+    <property name="Name" type="s" access="read"/>
+
+    <!-- ImapSupported:
+         Set to %TRUE if the messages for the account can be accessed
+         and manipulated using the
+         <ulink url="http://tools.ietf.org/html/rfc3501">IMAP</ulink>
+         protocol.
+      -->
+    <property name="ImapSupported" type="b" access="read"/>
+
+    <!-- ImapAcceptSslErrors:
+         @since: 3.8.0
+         Accept SSL/TLS errors caused by invalid certificates.
+      -->
+    <property name="ImapAcceptSslErrors" type="b" access="read"/>
+
+    <!-- ImapHost:
+         The IMAP server to use.
+
+         This may be in any of a number of recognized formats; an IPv6
+         address, an IPv4 address, or a domain name. A port override
+         may be specified in the usual way with a colon. Ports may be
+         given as decimal numbers or symbolic names
+         (cf. the <filename>/etc/services</filename> file).
+
+         If a port override is not given, then applications should try
+         to connect to port 993 if
+         #org.gnome.OnlineAccounts.Mail:ImapUseSsl is %TRUE and port
+         143 if not.
+    -->
+    <property name="ImapHost" type="s" access="read"/>
+
+    <!-- ImapUseSsl:
+         @since: 3.8.0
+         Whether SSL should be used.
+
+         This indicates that SSL should be used on a dedicated port.
+    -->
+    <property name="ImapUseSsl" type="b" access="read"/>
+
+    <!-- ImapUseTls:
+         Whether TLS should be used.
+
+         This indicates that STARTTLS should be used on a standard port
+         after the connection has been established to obtain a secure
+         channel.
+    -->
+    <property name="ImapUseTls" type="b" access="read"/>
+
+    <!-- ImapUserName:
+         The user name to use for logging in.
+
+         This may be blank if username/password authentication isn't
+         used or if the user name of the current user should be used.
+    -->
+    <property name="ImapUserName" type="s" access="read"/>
+
+    <!-- SmtpSupported:
+         Set to %TRUE if the
+         <ulink url="http://tools.ietf.org/html/rfc5321">SMTP</ulink>
+         protocol can be used to send messages for the account.
+      -->
+    <property name="SmtpSupported" type="b" access="read"/>
+
+    <!-- SmtpAcceptSslErrors:
+         @since: 3.8.0
+         Accept SSL/TLS errors caused by invalid certificates.
+      -->
+    <property name="SmtpAcceptSslErrors" type="b" access="read"/>
+
+    <!-- SmtpHost:
+         The SMTP server to use.
+
+         This may be in any of a number of recognized formats; an IPv6
+         address, an IPv4 address, or a domain name. A port override
+         may be specified in the usual way with a colon. Ports may be
+         given as decimal numbers or symbolic names
+         (cf. the <filename>/etc/services</filename> file).
+
+         If a port override is not given, then applications should try
+         to connect to port 465 if
+         #org.gnome.OnlineAccounts.Mail:SmtpUseSsl is %TRUE and port
+         587 (or 25) if not.
+    -->
+    <property name="SmtpHost" type="s" access="read"/>
+
+    <!-- SmtpUseAuth:
+         @since: 3.8.0
+         Whether authentication is needed
+
+         This indicates whether the server uses authentication.
+    -->
+    <property name="SmtpUseAuth" type="b" access="read"/>
+
+    <!-- SmtpAuthLogin:
+         @since: 3.12.0
+         Whether LOGIN authentication should be used.
+
+         This indicates whether the server uses the
+         <ulink url="http://msdn.microsoft.com/en-us/library/cc433484(v=EXCHG.80).aspx">
+         LOGIN</ulink> SASL mechanism for SMTP.
+    -->
+    <property name="SmtpAuthLogin" type="b" access="read"/>
+
+    <!-- SmtpAuthPlain:
+         @since: 3.12.0
+         Whether PLAIN authentication should be used.
+
+         This indicates whether the server uses the
+         <ulink url="http://tools.ietf.org/html/rfc4616">PLAIN</ulink>
+         SASL mechanism for SMTP.
+    -->
+    <property name="SmtpAuthPlain" type="b" access="read"/>
+
+    <!-- SmtpAuthXoauth2:
+         @since: 3.12.0
+         Whether XOAUTH2 authentication should be used.
+
+         This indicates whether the server uses the non-standard XOAUTH2
+         SASL mechanism for SMTP. This is implemented by
+         <ulink url="https://developers.google.com/gmail/xoauth2_protocol#the_sasl_xoauth2_mechanism">
+         GMail</ulink> and
+         <ulink url="http://blogs.office.com/2013/09/12/outlook-com-now-has-imap/">
+         Outlook.com</ulink>.
+    -->
+    <property name="SmtpAuthXoauth2" type="b" access="read"/>
+
+    <!-- SmtpUseSsl:
+         @since: 3.8.0
+         Whether SSL should be used.
+
+         This indicates that SSL should be used on a dedicated port.
+    -->
+    <property name="SmtpUseSsl" type="b" access="read"/>
+
+    <!-- SmtpUseTls:
+         Whether TLS should be used.
+
+         This indicates that STARTTLS should be used on a standard port
+         after the connection has been established to obtain a secure
+         channel.
+    -->
+    <property name="SmtpUseTls" type="b" access="read"/>
+
+    <!-- SmtpUserName:
+         The user name to use for logging in.
+
+         This may be blank if username/password authentication isn't
+         used or if the user name of the current user should be used.
+    -->
+    <property name="SmtpUserName" type="s" access="read"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Calendar:
+
+      An account object implements this interface if it provides
+      calendar-like capabilities. For example, it can represent a
+      <ulink url="http://tools.ietf.org/html/rfc4791">CalDAV</ulink>
+      server.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Calendar">
+    <!-- AcceptSslErrors:
+         @since: 3.8.0
+         Accept SSL/TLS errors caused by invalid certificates.
+      -->
+    <property name="AcceptSslErrors" type="b" access="read"/>
+
+    <!-- Uri:
+         @since: 3.8.0
+         The top-level location of the calendars.
+      -->
+    <property name="Uri" type="s" access="read"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Contacts:
+
+      An account object implements this interface if it provides
+      contacts-like capabilities. For example, it can represent a
+      <ulink url="http://tools.ietf.org/html/rfc6352">CardDAV</ulink>
+      server.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Contacts">
+    <!-- AcceptSslErrors:
+         @since: 3.8.0
+         Accept SSL/TLS errors caused by invalid certificates.
+      -->
+    <property name="AcceptSslErrors" type="b" access="read"/>
+
+    <!-- Uri:
+         @since: 3.8.0
+         The top-level location of the contacts.
+      -->
+    <property name="Uri" type="s" access="read"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Chat:
+
+      An account object implements this interface if it provides
+      chat-like capabilities.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Chat">
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Documents:
+
+      An account object implements this interface if it provides
+      documents-like capabilities.
+
+      The #org.gnome.OnlineAccounts.Documents interface is not used
+      by any account.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Documents">
+    <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Maps:
+      @since: 3.14.0
+
+      An account object implements this interface if it provides
+      maps-like capabilities.
+
+      The #org.gnome.OnlineAccounts.Maps interface is not used by
+      any account.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Maps">
+    <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Music:
+      @since: 3.18.0
+
+      An account object implements this interface if it provides
+      music-like capabilities.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Music">
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Photos:
+      @since: 3.8.0
+
+      An account object implements this interface if it provides
+      photos-like capabilities.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Photos">
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Files:
+      @since: 3.8.0
+
+      An account object implements this interface if it provides
+      files-like capabilities. For example, it can represent a
+      <ulink url="http://tools.ietf.org/html/rfc4918">WebDAV</ulink>
+      server.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Files">
+    <!-- AcceptSslErrors:
+         Accept SSL/TLS errors caused by invalid certificates.
+      -->
+    <property name="AcceptSslErrors" type="b" access="read"/>
+
+    <!-- Uri:
+         The top-level location of the files.
+
+         This is a
+         <ulink url="http://developer.gnome.org/gio/stable/GVfs.html">
+         Gvfs</ulink>-specific URI meant to be used with
+         <ulink url="http://developer.gnome.org/platform-overview/stable/gio">
+         GIO</ulink>. It may not work with anything else.
+      -->
+    <property name="Uri" type="s" access="read"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Exchange:
+      @since: 3.6.0
+
+      An account object implements this interface if it represents
+      a Microsoft Exchange server.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Exchange">
+    <!-- AcceptSslErrors:
+         @since: 3.8.0
+         Accept SSL/TLS errors caused by invalid certificates.
+      -->
+    <property name="AcceptSslErrors" type="b" access="read"/>
+
+    <!-- Host:
+         The Exchange server to use. This is always a domain name.
+
+         Use this to determine the <ulink
+         url="http://msdn.microsoft.com/en-us/library/gg591268&percnt;28v&period;exchg.140&percnt;29.aspx">
+         Autodiscover</ulink> service endpoints. eg. if
+         #org.gnome.OnlineAccounts.Exchange:Host is
+         <literal>bar.com</literal>, then the possible endpoints are
+         <literal>https://bar.com/autodiscover/autodiscover.xml
+         </literal> and <literal>
+         https://autodiscover.bar.com/autodiscover/autodiscover.xml
+         </literal>.
+      -->
+    <property name="Host" type="s" access="read"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.MediaServer:
+      @since: 3.14
+
+      An account object implements this interface if it provides
+      media server like capabilities.
+
+      The #org.gnome.OnlineAccounts.MediaServer interface is not used by
+      any account.
+  -->
+  <interface name="org.gnome.OnlineAccounts.MediaServer">
+    <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+
+    <!-- DlnaSupported:
+
+         True if media server device is DLNA supported.
+      -->
+    <property name="DlnaSupported" type="b" access="read">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </property>
+    <!-- Udn:
+
+         Unique Device Name. Used to uniquely identify the device.
+      -->
+    <property name="Udn" type="s" access="read">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </property>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Ticketing:
+      @since: 3.6.0
+
+      An account object implements this interface if it provides
+      ticketing capabilities.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Ticketing">
+    <!--
+      Details:
+      @since: 3.18
+
+      Metadata about the tickets getting fetched.
+      For kerberos tickets, this may contain a
+      preauthentication source used by pkinit
+      (such as PKCS11:libcoolkeypk11.so)
+      -->
+    <property name="Details" type="a{ss}" access="read"/>
+
+    <!--
+      GetTicket:
+
+      Use this method to obtain an ticket that can be used to
+      access resources for the account.
+    -->
+    <method name="GetTicket"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Todo:
+      @since: 3.26.0
+
+      An account object implements this interface if it provides
+      todo-like capabilities.
+
+      The #org.gnome.OnlineAccounts.Todo interface is not used by
+      any account.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Todo">
+    <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.ReadLater:
+      @since: 3.12.0
+
+      An account object implements this interface if it provides
+      read-later-like capabilities.
+
+      The #org.gnome.OnlineAccounts.ReadLater interface is not used by
+      any account.
+  -->
+  <interface name="org.gnome.OnlineAccounts.ReadLater">
+    <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+  </interface>
+
+  <!--
+      org.gnome.OnlineAccounts.Printers:
+      @since: 3.12.0
+
+      An account object implements this interface if it provides
+      network printing capabilities.
+  -->
+  <interface name="org.gnome.OnlineAccounts.Printers">
+    <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+  </interface>
+
+</node>

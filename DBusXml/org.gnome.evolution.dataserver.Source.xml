@@ -1,0 +1,225 @@
+<!DOCTYPE node PUBLIC
+"-//freedesktop//DTD D-Bus Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+	<!--
+    org.gnome.evolution.dataserver.Source:
+    @short_description: Data source
+
+    This interface is used to represent data sources.
+-->
+	<interface name="org.gnome.evolution.dataserver.Source">
+		 <!--UID: The unique identifier for the source.--> 
+		<property name="UID" type="s" access="read"/>
+		 <!--Data: Raw key file data describing the source.--> 
+		<property name="Data" type="s" access="read"/>
+		 <!--ConnectionStatus: Current ESourceConnectionStatus of the source. @since: 3.16--> 
+		<property name="ConnectionStatus" type="s" access="readwrite"/>
+
+		<!--
+      CredentialsRequired:
+      @reason: one of the ESourceCredentialsReason values
+      @certificate_pem: either an empty string or a PEM-encoded certificate
+                        being used for the SSL connection
+      @certificate_errors: a GTlsCertificateFlags bit-or of certificate errors
+      @dbus_error_name: a GDBus' error name for a failed authentication
+      @dbus_error_message: actual error message corresponding to @dbus_error_name
+      @since: 3.16
+
+      Emitted, when the source requires credentials, like for login, to be
+      able to connect to its destination. The client side may listen to it
+      to let a user know that the credentials are required, eventually ask
+      for the credentials (password) straight away.
+      The ConnectionStatus property changes accordingly, when one of
+      the listeners will provide the credentials using Authenticate method.
+      The reason argument says why the credentials are required.
+
+      The value E_SOURCE_CREDENTIALS_REASON_SSL_FAILED indicates a failed
+      certificate check on a secured connection, then the certificate_pem and
+      certificate_errors are populated with the actual certificate being used
+      and what failed with it. Otherwise these two arguments are meaningless.
+      The error argument can contain a text description of the certificate_errors too.
+
+      The value E_SOURCE_CREDENTIALS_REASON_ERROR indicates a failure
+      on the server side, other than rejected credentials or failed SSL
+      checks. In this case the 'error' argument holds a text description of
+      the error. The 'error' argument is meaningless or optional in other cases.
+  -->
+		<!--<signal name="CredentialsRequired">
+			<arg name="reason" direction="in" type="s"/>
+			<arg name="certificate_pem" direction="in" type="s"/>
+			<arg name="certificate_errors" direction="in" type="s"/>
+			<arg name="dbus_error_name" direction="in" type="s"/>
+			<arg name="dbus_error_message" direction="in" type="s"/>
+		</signal>-->
+
+		<!--
+      InvokeCredentialsRequired:
+      @since: 3.16
+
+      Invokes CredentialsRequired signal on the server side, thus it can
+      be received by all clients.
+  -->
+		<method name="InvokeCredentialsRequired">
+			<arg name="reason" direction="in" type="s"/>
+			<arg name="certificate_pem" direction="in" type="s"/>
+			<arg name="certificate_errors" direction="in" type="s"/>
+			<arg name="dbus_error_name" direction="in" type="s"/>
+			<arg name="dbus_error_message" direction="in" type="s"/>
+		</method>
+
+		<!--
+      GetLastCredentialsRequiredArguments:
+      @reason: (out): The 'reason' argument used in the last call of CredentialsRequired()
+      @certificate_pem: (out): The 'certificate_pem' argument used in the last call of CredentialsRequired()
+      @certificate_errors: (out): The 'certificate_errors' argument used in the last call of CredentialsRequired()
+      @dbus_error_name: (out): The 'dbus_error_name' argument used in the last call of CredentialsRequired()
+      @dbus_error_message: (out): The 'dbus_error_message' argument used in the last call of CredentialsRequired()
+      @since: 3.16
+
+      Returns the last arguments used to the call of CredentialsRequired().
+      The values are automatically unset with the Authenticate() call or
+      with an explicit call to UnsetLastCredentialsRequiredArguments().
+  -->
+		<method name="GetLastCredentialsRequiredArguments">
+			<arg name="reason" direction="out" type="s"/>
+			<arg name="certificate_pem" direction="out" type="s"/>
+			<arg name="certificate_errors" direction="out" type="s"/>
+			<arg name="dbus_error_name" direction="out" type="s"/>
+			<arg name="dbus_error_message" direction="out" type="s"/>
+		</method>
+
+		<!--
+      UnsetLastCredentialsRequiredArguments:
+      @since: 3.18
+
+      Unsets the last arguments used to the call of CredentialsRequired().
+      The values are automatically unset with the Authenticate() call too.
+  -->
+		<method name="UnsetLastCredentialsRequiredArguments">
+		</method>
+
+		<!--
+      Authenticate:
+      @credentials: provided credentials, in a GKeyFile format
+      @since: 3.16
+
+      This is a response method for a signal CredentialsRequired, when
+      the credentials had been obtained from a user. The @credentials is
+      an array of strings suitable for ECredentials structure.
+  --><!--
+		<signal name="Authenticate">
+			<arg name="credentials" direction="in" type="as"/>
+		</signal>
+
+		--><!--
+      InvokeAuthenticate:
+      @since: 3.16
+
+      Invokes Authenticate signal on the server side, thus it can
+      be received by all clients (and served by backends).
+  -->
+		<method name="InvokeAuthenticate">
+			<arg name="credentials" direction="in" type="as"/>
+		</method>
+
+	</interface>
+
+	<!--
+    org.gnome.evolution.dataserver.Source.Removable:
+    @short_description: Removable data source
+
+    This interface is used to represent removable data sources.
+-->
+	<interface name="org.gnome.evolution.dataserver.Source.Removable">
+		<!--
+      Remove:
+
+      Permanently removes the data source.
+  -->
+		<method name="Remove"/>
+	</interface>
+
+	<!--
+    org.gnome.evolution.dataserver.Source.Writable:
+    @short_description: Writable data source
+
+    This interface is used to represent writable data sources.
+-->
+	<interface name="org.gnome.evolution.dataserver.Source.Writable">
+		<!--
+      Write:
+      @data: Raw key file data describing the source
+
+      Submits new key file data for the source, which is written
+      to disk and then reflected in the Data property.
+  -->
+		<method name="Write">
+			<arg name="data" direction="in" type="s"/>
+		</method>
+	</interface>
+
+	<!--
+    org.gnome.evolution.dataserver.Source.RemoteCreatable:
+    @short_description: Create remote resources
+
+    This interface is used to create resources on a remote server.
+-->
+	<interface name="org.gnome.evolution.dataserver.Source.RemoteCreatable">
+		<!--
+      Create:
+      @uid: Unique identifier for the new data source
+      @data: Raw key file data describing the resource to create
+
+      Creates a remote resource according to details in @data.
+      The newly-created resource will be proxied by a new data
+      source with a unique identifier of @uid.
+  -->
+		<method name="Create">
+			<arg name="uid" direction="in" type="s"/>
+			<arg name="data" direction="in" type="s"/>
+		</method>
+	</interface>
+
+	<!--
+    org.gnome.evolution.dataserver.Source.RemoteDeletable:
+    @short_description: Delete remote resources
+
+    This interface is used to delete resources from a remote server.
+-->
+	<interface name="org.gnome.evolution.dataserver.Source.RemoteDeletable">
+		<!--
+      Delete:
+
+      Deletes the remote resource being proxied by this data source.
+  -->
+		<method name="Delete"/>
+	</interface>
+
+	<!--
+    org.gnome.evolution.dataserver.Source.OAuth2Support:
+    @short_description: Supports OAuth 2.0 authentication
+
+    This interface is used by data sources that support
+    <ulink url="http://oauth.net/2/">OAuth 2.0</ulink> authentication,
+    usually backed by a desktop-wide authentication service such as
+    <ulink url="https://wiki.gnome.org/Projects/GnomeOnlineAccounts">GNOME Online
+    Accounts</ulink>.
+-->
+	<interface name="org.gnome.evolution.dataserver.Source.OAuth2Support">
+		
+      <!--GetAccessToken:
+      @access_token: The access token
+      @expires_in: The duration in seconds that the returned token is
+                   valid for, or 0 if unknown
+
+      Obtains an access token that can be used to access OAuth2-based
+      services for the data source.-->
+  
+		<method name="GetAccessToken">
+			<arg name="access_token" type="s" direction="out"/>
+			<arg name="expires_in" type="i" direction="out"/>
+		</method>
+	</interface>
+</node>

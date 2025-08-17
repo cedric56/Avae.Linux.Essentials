@@ -1,0 +1,52 @@
+<!DOCTYPE node PUBLIC
+"-//freedesktop//DTD D-Bus Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+	<!--
+    org.gnome.evolution.dataserver.SourceManager:
+    @short_description: SourceManager interface
+
+    Interface for top-level manager singleton objects.
+-->
+	<interface name="org.gnome.evolution.dataserver.SourceManager">
+
+		<!--
+      CreateSources:
+      @array: An array of "uid" and "data" pairs
+
+      Creates a new data source for each "uid" and "data" string pair in
+      @array and adds them to the list of managed objects.  The "uid" part
+      is a unique identifier for the new source, and the "data" part is the
+      raw key file data describing the new source.
+  -->
+		<method name="CreateSources">
+			<arg name="array" direction="in" type="a{ss}"/>
+		</method>
+
+		<!--
+      Reload:
+
+      Reloads the registry service as if it were stopped and restarted.
+      Client applications will see all exported objects suddenly removed
+      and replaced by a new and possibly different set of objects.
+
+      The primary use case for this method is to rerun the data migration
+      routines that run automatically on startup.
+
+      A reload can also be triggered by sending the SourceManager process
+      a SIGHUP on platforms that support it.
+  -->
+		<method name="Reload"/>
+
+		<!--
+      RefreshBackend:
+      @source_uid: A UID of a collection ESource
+
+      Initiates refresh of a backend for a collection ESource with the given source_uid.
+  -->
+		<method name="RefreshBackend">
+			<arg name="source_uid" direction="in" type="s"/>
+		</method>
+	</interface>
+</node>

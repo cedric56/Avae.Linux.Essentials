@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Avae.Linux.Essentials</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>cedricb</Authors>
+    <Product>Avae.Linux.Essentials</Product>
+    <Description>Portage of Microsoft.Maui.Essentials for Linux</Description>
+    <PackageTags>maui;avalonia;essentials;crossplatform</PackageTags>
+    <RepositoryUrl>https://github.com/cedric56/Avae.Linux.Essentials</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/cedric56/Avae.Linux.Essentials</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>Licence.md</PackageLicenseFile>
+    <AssemblyName>Microsoft.Maui.Essentials</AssemblyName>
+    <RootNamespace>Microsoft.Maui.Essentials</RootNamespace>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.0" />
+    <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
+    <!--<PackageReference Include="Emgu.CV.runtime.ubuntu-x64" Version="4.10.0.5680" />-->
+    <PackageReference Include="GtkSharp" Version="3.24.24.95" />
+    <PackageReference Include="SecureLocalStorage" Version="2.0.0" />
+    <PackageReference Include="Tmds.DBus" Version="0.21.2">
+      <Aliases>TmdsDBus</Aliases>
+    </PackageReference>	  
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.2" />
+    <PackageReference Include="Tmds.DBus.SourceGenerator" Version="0.0.21">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="VCardParser" Version="1.2.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="Licence.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <AdditionalFiles Include="DBusXml/org.freedesktop.GeoClue2.Agent.xml" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="DBusXml/org.freedesktop.GeoClue2.Client.xml" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="DBusXml/org.freedesktop.GeoClue2.Location.xml" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="DBusXml/org.freedesktop.GeoClue2.Manager.xml" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="DBusXml/org.freedesktop.UPower.xml" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="DBusXml/org.freedesktop.UPower.Device.xml" DBusGeneratorMode="Proxy" />
+    <AdditionalFiles Include="DBusXml/org.gnome.evolution.dataserver.AddressBook.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.gnome.evolution.dataserver.AddressBookFactory.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.freedesktop.DBus.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.freedesktop.DBus.ObjectManager.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.freedesktop.Secrets.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.gnome.OnlineAccounts.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.gnome.evolution.dataserver.Source.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.gnome.evolution.dataserver.SourceManager.xml" DBusGeneratorMode="Proxy" />
+	  <AdditionalFiles Include="DBusXml/org.gnome.Shell.xml" DBusGeneratorMode="Proxy" />
+  </ItemGroup>
+
+  </Project>
