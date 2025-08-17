@@ -35,8 +35,6 @@ OR
 
 # Configuration
 
-No additional configuration is required. The essentials.js file is automatically copied to your wwwroot folder during the build process, ensuring seamless integration.
-
 1. Enable TextToSpeech
 
 ````
