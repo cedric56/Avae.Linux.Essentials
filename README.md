@@ -77,7 +77,7 @@ OR
 
 # Usage
 
-Once installed, you can use Microsoft.Maui.Essentials APIs within your Avalonia.Browser application. For example, access application information via AppInfo or handle web authentication with WebAuthenticator.
+Once installed, you can use Microsoft.Maui.Essentials APIs within your Avalonia.Linux application. For example, access application information via AppInfo.
 
 # Example: Accessing AppInfo
 ````
