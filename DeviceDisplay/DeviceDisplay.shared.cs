@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Maui.Devices
 {
@@ -158,5 +159,7 @@ namespace Microsoft.Maui.Devices
 		protected abstract void StartScreenMetricsListeners();
 
 		protected abstract void StopScreenMetricsListeners();
-	}
+
+        
+    }
 }

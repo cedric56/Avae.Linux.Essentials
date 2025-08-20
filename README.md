@@ -48,12 +48,10 @@ OR
 3. Enable Preferences, set the name of the folder 
 
 ````
+ using Microsoft.Maui.ApplicationModel;
  public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
-            .AfterSetup(builder =>
-            {
-                Microsoft.Maui.ApplicationModel.Platform.Initialize("myappName", LinuxEssentials.GetLibCVExternPath("YourProject.Native.libcvextern.so"));
-            })
+            .UseMauiEssentials("myappName", "YourProject.Native.libcvextern.so")
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
@@ -62,12 +60,10 @@ OR
 4. Enable MediaPicker, you must have libcvextern.so. Consider is in an Native folder
 
 ````
+ using Microsoft.Maui.ApplicationModel;
  public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
-            .AfterSetup(builder =>
-            {
-                Microsoft.Maui.ApplicationModel.Platform.Initialize("myappName", LinuxEssentials.GetLibCVExternPath("YourProject.Native.libcvextern.so"));
-            })
+            .UseMauiEssentials("myappName", "YourProject.Native.libcvextern.so")
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

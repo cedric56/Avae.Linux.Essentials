@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.ApplicationModel;
+using System.Diagnostics;
+using System.Timers;
 
 namespace Microsoft.Maui.Devices
 {
@@ -56,17 +58,27 @@ namespace Microsoft.Maui.Devices
 
         protected override DisplayInfo GetMainDisplayInfo()
         {
-            var mainMonitor = PrimaryMonitor;
+            var mainMonitor = Monitor;
             var geometry = mainMonitor.Geometry;
             var orientation = geometry.Height > geometry.Width ? DisplayOrientation.Portrait : DisplayOrientation.Landscape;
             var rate = mainMonitor.RefreshRate / 1000; // The value is in milli-Hertz, so a refresh rate of 60Hz is returned as 60000.
-
+            
             return new DisplayInfo(geometry.Width, geometry.Height, DefaultScreen.Resolution, orientation, DisplayRotation.Unknown, rate);
         }
 
+        ScreenChangeDetector _detector = new ScreenChangeDetector();
+        static int iScreen = 0;
         protected override void StartScreenMetricsListeners()
         {
+            _detector.Start();
+            _detector.ScreenChanged += _detector_ScreenChanged;
             DefaultScreen.SizeChanged += DefaultScreenOnSizeChanged;
+        }
+
+        private void _detector_ScreenChanged(object? sender, int e)
+        {
+            iScreen = e;
+            OnMainDisplayInfoChanged();
         }
 
         void DefaultScreenOnSizeChanged(object sender, EventArgs e)
@@ -76,6 +88,8 @@ namespace Microsoft.Maui.Devices
 
         protected override void StopScreenMetricsListeners()
         {
+            _detector.ScreenChanged -= _detector_ScreenChanged;
+            _detector.Stop();
             DefaultScreen.SizeChanged += DefaultScreenOnSizeChanged;
         }
 
@@ -112,12 +126,12 @@ namespace Microsoft.Maui.Devices
 
         public static Gdk.Monitor CurrentMonitor => DefaultDisplay.GetMonitorAtPoint(0, 0); // TODO: find out aktual mouse position
 
-        public static Gdk.Monitor PrimaryMonitor
+        public static Gdk.Monitor Monitor
         {
             get
             {
-                var monitor =  GetMonitors().SingleOrDefault(m => m.IsPrimary);
-                return monitor ?? GetMonitors().First(); // Fallback to current monitor if no primary monitor is found
+                var monitors = GetMonitors();
+                return monitors.ElementAt(iScreen);
             }
             
         }
@@ -132,5 +146,59 @@ namespace Microsoft.Maui.Devices
             }
         }
 
+        public class ScreenChangeDetector
+        {
+            public event EventHandler<int> ScreenChanged;
+            private readonly IEnumerable<Gdk.Monitor> _monitors; // IEnumerable<Gdk.Monitor>
+            private readonly System.Timers.Timer _timer;
+            private int _lastMonitorIndex = -1;
+
+            public ScreenChangeDetector()
+            {
+                _monitors = DeviceDisplayImplementation.GetMonitors();
+                _timer = new System.Timers.Timer(1000); // Poll every 1 second
+                _timer.Elapsed += CheckScreenChange;
+                _timer.AutoReset = true;
+            }
+
+            public void Start()
+            {
+                _timer.Start();
+            }
+
+            public void Stop()
+            {
+                _timer.Stop();
+            }
+
+            private void CheckScreenChange(object sender, ElapsedEventArgs e)
+            {
+                // Ensure we're on the GTK thread (required for GDK calls)
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    var _gtkWindow = WindowStateManager.Default.GetActiveWindow(false);
+                    // Find the monitor containing the window's top-left corner
+                    int currentMonitorIndex = -1;
+                    for (int i = 0; i < _monitors.Count(); i++)
+                    {
+                        var monitor = _monitors.ElementAt(i);
+                        var geometry = monitor.Geometry;
+
+                        if (_gtkWindow.Position.X >= geometry.X && _gtkWindow.Position.X < geometry.X + geometry.Width &&
+                            _gtkWindow.Position.Y >= geometry.Y && _gtkWindow.Position.Y < geometry.Y + geometry.Height)
+                        {
+                            currentMonitorIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (currentMonitorIndex != _lastMonitorIndex && currentMonitorIndex != -1)
+                    {
+                        ScreenChanged?.Invoke(this, currentMonitorIndex);
+                        _lastMonitorIndex = currentMonitorIndex;
+                    }
+                });
+            }
+        }
     }
 }

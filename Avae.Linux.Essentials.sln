@@ -5,6 +5,10 @@ VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avae.Linux.Essentials", "Avae.Linux.Essentials.csproj", "{F5A08E4B-5EC6-A07F-C7C6-413685B6AA1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication4", "..\AvaloniaApplication4\AvaloniaApplication4.csproj", "{B1B5444D-E613-EBB2-4069-ED664A9A79A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication4.Desktop", "..\AvaloniaApplication4.Desktop\AvaloniaApplication4.Desktop.csproj", "{87B243A1-33C9-4943-421A-7E70B202E67D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{F5A08E4B-5EC6-A07F-C7C6-413685B6AA1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5A08E4B-5EC6-A07F-C7C6-413685B6AA1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5A08E4B-5EC6-A07F-C7C6-413685B6AA1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B5444D-E613-EBB2-4069-ED664A9A79A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B5444D-E613-EBB2-4069-ED664A9A79A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B5444D-E613-EBB2-4069-ED664A9A79A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B5444D-E613-EBB2-4069-ED664A9A79A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87B243A1-33C9-4943-421A-7E70B202E67D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87B243A1-33C9-4943-421A-7E70B202E67D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87B243A1-33C9-4943-421A-7E70B202E67D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87B243A1-33C9-4943-421A-7E70B202E67D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

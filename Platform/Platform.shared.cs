@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Media;
@@ -17,7 +18,7 @@ namespace Microsoft.Maui.ApplicationModel
 
         static List<Window> _windows = new List<Window>();
 
-        public static void Initialize(string appName, string libcvexternPath, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
+        public static AppBuilder UseMauiEssentials(this AppBuilder builder, string appName, string libcvexternPath = null, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
         {
             GLib.ExceptionManager.UnhandledException += (e) =>
             {
@@ -26,7 +27,7 @@ namespace Microsoft.Maui.ApplicationModel
             };
 
             AppName = appName;
-            LibcvexternPath = libcvexternPath;
+            LibcvexternPath = GetLibCVExternPath(libcvexternPath);
             AccountPicker = accountPicker;
             CapturePicker = capturePicker;
             SharePicker = sharePicker;
@@ -52,6 +53,7 @@ namespace Microsoft.Maui.ApplicationModel
                 if (_windows.Count > 0)
                     OnActivated(_windows.Last());
             });
+            return builder;
         }
 
         /// <summary>
@@ -63,6 +65,9 @@ namespace Microsoft.Maui.ApplicationModel
         /// <exception cref="Exception"></exception>
         public static string GetLibCVExternPath(string embeddedRessourcePath)
         {
+            if (string.IsNullOrWhiteSpace(embeddedRessourcePath))
+                return string.Empty;
+
             string tempPath = Path.Combine(Path.GetTempPath(), "libcvextern.so");
             using var stream = Assembly.GetCallingAssembly().GetManifestResourceStream(embeddedRessourcePath);// "Microsoft.Maui.Essentials.Native.libcvextern.so");
             if (stream is null)
