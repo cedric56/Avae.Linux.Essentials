@@ -45,20 +45,14 @@ namespace Microsoft.Maui.Storage
 
             internal byte[] EncryptData(string data, byte[] key, DataProtectionScope scope)
             {
-                if (data == null)
-                {
-                    throw new ArgumentNullException("data");
-                }
+                ArgumentNullException.ThrowIfNull(data);
 
                 if (data.Length <= 0)
                 {
                     throw new ArgumentException("data");
                 }
 
-                if (key == null)
-                {
-                    throw new ArgumentNullException("key");
-                }
+                ArgumentNullException.ThrowIfNull(key);
 
                 if (key.Length == 0)
                 {
@@ -75,20 +69,14 @@ namespace Microsoft.Maui.Storage
 
             internal string DecryptData(byte[] data, byte[] key, DataProtectionScope scope)
             {
-                if (data == null)
-                {
-                    throw new ArgumentNullException("data");
-                }
+                ArgumentNullException.ThrowIfNull(data);
 
                 if (data.Length == 0)
                 {
                     throw new ArgumentException("data");
                 }
 
-                if (key == null)
-                {
-                    throw new ArgumentNullException("key");
-                }
+                ArgumentNullException.ThrowIfNull(key);
 
                 if (key.Length == 0)
                 {

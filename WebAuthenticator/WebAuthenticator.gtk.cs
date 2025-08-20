@@ -27,9 +27,12 @@ namespace Microsoft.Maui.Authentication
             responseOutput.Close();
             listener.Stop();
 
-            var decoder = webAuthenticatorOptions.ResponseDecoder ?? throw new NotImplementedException("ResponseDecoder must be implemented");
-            var dictionary = decoder.DecodeResponse(context.Request.Url);
-            return new WebAuthenticatorResult(dictionary);
+            if (webAuthenticatorOptions.ResponseDecoder is not null)
+            {
+                var dictionary = webAuthenticatorOptions.ResponseDecoder.DecodeResponse(context.Request.Url);
+                return new WebAuthenticatorResult(dictionary);
+            }
+            return new WebAuthenticatorResult(context.Request.Url);
         }
     }
 }

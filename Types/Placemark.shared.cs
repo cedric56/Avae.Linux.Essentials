@@ -1,5 +1,3 @@
-using System;
-
 namespace Microsoft.Maui.Devices.Sensors
 {
 	/// <summary>

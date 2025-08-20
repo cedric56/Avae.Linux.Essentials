@@ -1,6 +1,3 @@
-using System;
-using Microsoft.Maui.ApplicationModel;
-
 namespace Microsoft.Maui.Devices
 {
 	/// <summary>

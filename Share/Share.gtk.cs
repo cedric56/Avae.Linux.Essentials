@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Microsoft.Maui.Devices;
+using Microsoft.Maui.Essentials;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.Maui.ApplicationModel.DataTransfer
@@ -21,31 +22,22 @@ namespace Microsoft.Maui.ApplicationModel.DataTransfer
         public Task Open(ShareTextRequest request, IEnumerable<ShareTarget> targets)
         {
             var mainWindow = new ShareImplementation.ShareWindow(targets);
-            mainWindow.ShowDialog(GetMainWindow());
+            mainWindow.ShowDialog(WindowStateManager.Default.GetActiveWindow(false));
             return Task.CompletedTask;
         }
 
         public Task Open(ShareFileRequest request, IEnumerable<ShareTarget> targets)
         {
             var mainWindow = new ShareImplementation.ShareWindow(targets, request.File.FullPath);
-            mainWindow.ShowDialog(GetMainWindow());
+            mainWindow.ShowDialog(WindowStateManager.Default.GetActiveWindow(false));
             return Task.CompletedTask;
         }
 
         public Task Open(ShareMultipleFilesRequest request, IEnumerable<ShareTarget> targets)
         {
             var mainWindow = new ShareImplementation.ShareWindow(targets, request.Files.Select(f => f.FullPath).ToArray());
-            mainWindow.ShowDialog(GetMainWindow());
+            mainWindow.ShowDialog(WindowStateManager.Default.GetActiveWindow(false));
             return Task.CompletedTask;
-        }
-
-        public static Window GetMainWindow()
-        {
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                return desktop.MainWindow;
-            }
-            throw new InvalidOperationException("Main window not found.");
         }
     }
 
@@ -110,17 +102,17 @@ namespace Microsoft.Maui.ApplicationModel.DataTransfer
                         }
                     }
 
-                    var attachment = attachements.FirstOrDefault();
-                    if(string.IsNullOrWhiteSpace(attachment))
-                        continue;
-                    var lines = File.ReadAllLines(file);
-                    bool foundMime = lines.Any(l => l.StartsWith("MimeType=") && l.Contains(MimeHelper.GetMimeType(Path.GetExtension(attachment))));
-                    if (!foundMime) continue;
+                    //var attachment = attachements.FirstOrDefault();
+                    //if(string.IsNullOrWhiteSpace(attachment))
+                    //    continue;
+                    //var lines = File.ReadAllLines(file);
+                    //bool foundMime = lines.Any(l => l.StartsWith("MimeType=") && l.Contains(MimeHelper.GetMimeType(Path.GetExtension(attachment))));
+                    //if (!foundMime) continue;
 
-                    name = lines.FirstOrDefault(l => l.StartsWith("Name="))?.Split('=')[1] ?? Path.GetFileName(file);
-                    exec = lines.FirstOrDefault(l => l.StartsWith("Exec="))?.Split('=')[1] ?? "Unknown";
-                    icon = lines.FirstOrDefault(l => l.StartsWith("Icon="))?.Split('=')[1] ?? "Unknown";
-                    apps.Add((name, exec, icon));
+                    //name = lines.FirstOrDefault(l => l.StartsWith("Name="))?.Split('=')[1] ?? Path.GetFileName(file);
+                    //exec = lines.FirstOrDefault(l => l.StartsWith("Exec="))?.Split('=')[1] ?? "Unknown";
+                    //icon = lines.FirstOrDefault(l => l.StartsWith("Icon="))?.Split('=')[1] ?? "Unknown";
+                    //apps.Add((name, exec, icon));
                 }
             }
             var targets = new List<ShareTarget>();

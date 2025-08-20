@@ -6,6 +6,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Essentials;
 using Microsoft.Maui.Storage;
 using System.Runtime.InteropServices;
@@ -27,14 +28,12 @@ namespace Microsoft.Maui.Media
         public async Task<FileResult> CapturePhotoAsync(MediaPickerOptions? options = null)
         {
             var window = new MediaPickerImplementation.CapturePhotoWindow();
-            return await window.ShowDialog<FileResult>(
-                (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow);
+            return await window.ShowDialog<FileResult>(WindowStateManager.Default.GetActiveWindow(false));
         }
         public async Task<FileResult> CaptureVideoAsync(MediaPickerOptions? options = null)
         {
             var window = new MediaPickerImplementation.CaptureVideoWindow();
-            return await window.ShowDialog<FileResult>(
-                (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow);
+            return await window.ShowDialog<FileResult>(WindowStateManager.Default.GetActiveWindow(false));
         }
     }
 
@@ -50,7 +49,7 @@ namespace Microsoft.Maui.Media
                 try
                 {    
                     // Optionally: preload cvextern to avoid DllNotFoundException
-                    NativeLibrary.Load(GtkEssentials.LibcvexternPath);
+                    NativeLibrary.Load(Platform.LibcvexternPath);
                 }
                 catch (Exception e)
                 {

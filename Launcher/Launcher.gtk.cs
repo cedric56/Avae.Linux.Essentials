@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.Essentials;
 
 namespace Microsoft.Maui.ApplicationModel
 {
@@ -18,9 +18,7 @@ namespace Microsoft.Maui.ApplicationModel
 
         private Task<bool> OpenAsync(string url)
         {
-            var process = new Process();
-            process.StartInfo = new ProcessStartInfo("xdg-open", url);
-            return Task.FromResult(process.Start());
+            return Task.FromResult(ProcessHelper.XDG_OPEN(url));
         }
     }
 }

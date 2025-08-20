@@ -20,25 +20,21 @@ namespace Microsoft.Maui.Media
                     CreateNoWindow = true
                 };
 
-                using (var process = Process.Start(startInfo))
+                using var process = Process.Start(startInfo);
+                using var reader = process.StandardOutput;
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    using (var reader = process.StandardOutput)
-                    {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            // Skip the header line
-                            if (line.StartsWith("Voice name"))
-                                continue;
+                    // Skip the header line
+                    if (line.StartsWith("Voice name"))
+                        continue;
 
-                            // Parse the line (this assumes a specific format)
-                            var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            if (parts.Length >= 2)
-                            {
-                                var locale = new Locale(parts[1], string.Join(" ", parts[3..]), parts[3], parts[0]);
-                                locales.Add(locale);
-                            }
-                        }
+                    // Parse the line (this assumes a specific format)
+                    var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length >= 2)
+                    {
+                        var locale = new Locale(parts[1], string.Join(" ", parts[3..]), parts[3], parts[0]);
+                        locales.Add(locale);
                     }
                 }
             }

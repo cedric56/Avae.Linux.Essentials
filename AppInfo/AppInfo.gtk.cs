@@ -1,8 +1,7 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Styling;
 using Microsoft.Maui.Devices;
+using Microsoft.Maui.Essentials;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -43,7 +42,7 @@ namespace Microsoft.Maui.ApplicationModel
         {
             get
             {
-                var direction = GetTopLevel().FlowDirection;
+                var direction = AvaloniaInterop.GetTopLevel()?.FlowDirection;
                 if (direction == null)
                     return LayoutDirection.Unknown;
                 return direction == Avalonia.Media.FlowDirection.LeftToRight
@@ -52,37 +51,28 @@ namespace Microsoft.Maui.ApplicationModel
             }
         }
 
-        private void Start(string command)
-        {
-            
-            try
-            {
-                using var process = new Process();
-                process.StartInfo = new ProcessStartInfo(command) {
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false
-};
-                process.Start();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to start process: {ex.Message}");
-            }
-        }
-
         public  void ShowSettingsUI()
         {
-            if(DeviceInfo.Current is DeviceInfoImplementation implementation && implementation.Distribution == Distribution.Ubuntu)
+            if(DeviceInfo.Current is DeviceInfoImplementation implementation)
             {
-                Process.Start(new ProcessStartInfo()
+                if (implementation.Desktop == Desktop.Gnome)
                 {
-                     FileName = "gnome-control-center",
-                    Arguments = "applications",
-                    UseShellExecute = false
-                });
-                //Process.Start("gnome-control-center");
-                Start("gnome-control-center");
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        FileName = "gnome-control-center",
+                        Arguments = "applications",
+                        UseShellExecute = false
+                    });
+                }
+                else if(implementation.Desktop == Desktop.KDE)
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        FileName = "systemsettings5",
+                        Arguments = "applications",
+                        UseShellExecute = false
+                    });
+                }
             }
 
         //    string[] settingsCommands = {
@@ -106,20 +96,6 @@ namespace Microsoft.Maui.ApplicationModel
 
         //            }
         //    }
-        }
-
-        public static TopLevel GetTopLevel()
-        {
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
-            {
-                return TopLevel.GetTopLevel(desktopLifetime.MainWindow);
-            }
-            else if (Application.Current?.ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-            {
-                return TopLevel.GetTopLevel(singleViewPlatform.MainView);
-            }
-
-            return TopLevel.GetTopLevel(null);
         }
 
         internal static string PublisherName => _launchingAssembly.GetAppInfoValue("PublisherName") ?? _launchingAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? string.Empty;

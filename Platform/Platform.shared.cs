@@ -1,11 +1,12 @@
-﻿using Microsoft.Maui.ApplicationModel.Communication;
+﻿using Avalonia.Controls;
+using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Media;
 using System.Reflection;
 
-namespace Microsoft.Maui.Essentials
+namespace Microsoft.Maui.ApplicationModel
 {
-    public static class LinuxEssentials
+    public static class Platform
     {
         internal static string AppName { get; private set; }
         internal static string LibcvexternPath { get; private set; }
@@ -14,7 +15,9 @@ namespace Microsoft.Maui.Essentials
 
         internal static ISharePicker? SharePicker { get; private set; }
 
-        public static void Configure(string appName, string libcvexternPath, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
+        static List<Window> _windows = new List<Window>();
+
+        public static void Initialize(string appName, string libcvexternPath, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
         {
             GLib.ExceptionManager.UnhandledException += (e) =>
             {
@@ -23,12 +26,33 @@ namespace Microsoft.Maui.Essentials
             };
 
             AppName = appName;
-            LibcvexternPath= libcvexternPath;
+            LibcvexternPath = libcvexternPath;
             AccountPicker = accountPicker;
             CapturePicker = capturePicker;
             SharePicker = sharePicker;
-        }
 
+            Window.GotFocusEvent.AddClassHandler(typeof(Window), (sender, args) =>
+            {
+                var window = (Window)sender!;
+                OnActivated(window);
+            });
+            Window.WindowOpenedEvent.AddClassHandler(typeof(Window), (sender, args) =>
+            {
+                var window = (Window)sender!;
+                if (!_windows.Contains(window))
+                {
+                    _windows.Add(window);
+                    OnActivated(window);
+                }
+            });
+            Window.WindowClosedEvent.AddClassHandler(typeof(Window), (sender, _) =>
+            {
+                var window = (Window)sender!;
+                _windows.Remove(window);
+                if (_windows.Count > 0)
+                    OnActivated(_windows.Last());
+            });
+        }
 
         /// <summary>
         /// Example libcvextern.so is in a folder Native
@@ -49,5 +73,8 @@ namespace Microsoft.Maui.Essentials
             }
             return tempPath;
         }
+
+        public static void OnActivated(Avalonia.Controls.Window window) =>
+        WindowStateManager.Default.OnActivated(window);
     }
 }

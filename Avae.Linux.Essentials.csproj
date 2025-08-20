@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Avae.Linux.Essentials</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.2</Version>
     <Authors>cedricb</Authors>
     <Product>Avae.Linux.Essentials</Product>
     <Description>Portage of Microsoft.Maui.Essentials for Linux</Description>
@@ -24,7 +24,6 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.0" />
     <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
-    <!--<PackageReference Include="Emgu.CV.runtime.ubuntu-x64" Version="4.10.0.5680" />-->
     <PackageReference Include="GtkSharp" Version="3.24.24.95" />
     <PackageReference Include="SecureLocalStorage" Version="2.0.0" />
     <PackageReference Include="Tmds.DBus" Version="0.21.2">

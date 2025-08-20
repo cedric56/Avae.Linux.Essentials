@@ -1,8 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Templates;
 using Avalonia.Layout;
 using Microsoft.Maui.Devices;
+using Microsoft.Maui.Essentials;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -10,21 +12,31 @@ namespace Microsoft.Maui.ApplicationModel.Communication
 {
     public interface IAccountPicker
     {
-        Task<string?> PickAccountAsync(IEnumerable<string> accounts);
+        Task<string?> PickAccountAsync(IEnumerable<AddressBook> accounts);
         Task<Contact?> PickContactAsync(IEnumerable<Contact> contacts);
     }
 
     class AccountPickerImplementation : IAccountPicker
     {
-        public Task<string?> PickAccountAsync(IEnumerable<string> accounts)
+        public Task<string?> PickAccountAsync(IEnumerable<AddressBook> accounts)
         {
             var window = new ContactsImplementation.ItemSelectionWindow(accounts);
-            return window.ShowDialog<string?>((Avalonia.Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow);
+            return window.ShowDialog<string?>(WindowStateManager.Default.GetActiveWindow(false));
         }
         public Task<Contact?> PickContactAsync(IEnumerable<Contact> contacts)
         {
             var window = new ContactsImplementation.ItemSelectionWindow(contacts);
-            return window.ShowDialog<Contact?>((Avalonia.Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow);
+            return window.ShowDialog<Contact?>(WindowStateManager.Default.GetActiveWindow(false));
+        }
+    }
+
+    public class AddressBook
+    {
+        public string Book { get; set; }
+        public string Address { get; set; }
+        public AddressBook(string book, string address) { 
+            Book = book;
+            Address = address;
         }
     }
 
@@ -42,7 +54,7 @@ namespace Microsoft.Maui.ApplicationModel.Communication
             if (DeviceInfo.Current is DeviceInfoImplementation implementation)
             {
                 if (implementation.Desktop == Desktop.Gnome ||
-                    implementation.Distribution == Distribution.Ubuntu)
+                    implementation.Desktop == Desktop.WSL)
                     return await GetGnomeAllAsync(cancellationToken);
                 else if (implementation.Desktop == Desktop.KDE)
                     return await GetKdeAllAsync(cancellationToken);
@@ -95,7 +107,7 @@ namespace Microsoft.Maui.ApplicationModel.Communication
 
         public class ItemSelectionWindow : Window
         {
-            public ItemSelectionWindow(IEnumerable<string> addresses)
+            public ItemSelectionWindow(IEnumerable<AddressBook> addresses)
                 : base()
             {
                 Title = "Select an account";
@@ -105,6 +117,14 @@ namespace Microsoft.Maui.ApplicationModel.Communication
 
                 var listBox = new Avalonia.Controls.ListBox
                 {
+                    ItemTemplate = new FuncDataTemplate<AddressBook>((group, _) =>
+                    {
+                        return new TextBlock
+                        {
+                            Text = group.Book + " - " + group.Address,
+                            Margin = new Thickness(0, 5, 0, 2)
+                        };
+                    }),
                     ItemsSource = addresses,
                 };
 

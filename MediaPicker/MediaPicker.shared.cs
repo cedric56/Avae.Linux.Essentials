@@ -1,4 +1,5 @@
 #nullable enable
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Essentials;
 using Microsoft.Maui.Storage;
 
@@ -92,7 +93,7 @@ namespace Microsoft.Maui.Media
 		/// Provides the default implementation for static usage of this API.
 		/// </summary>
 		public static IMediaPicker Default =>
-			defaultImplementation ??= new MediaPickerImplementation(GtkEssentials.CapturePicker);
+			defaultImplementation ??= new MediaPickerImplementation(Platform.CapturePicker);
 
 		internal static void SetDefault(IMediaPicker? implementation) =>
 			defaultImplementation = implementation;

@@ -6,8 +6,6 @@ A port of Microsoft.Maui.Essentials tailored for Avalonia.Linux, bringing essent
 
 Cross-Platform Essentials: Leverage APIs from Microsoft.Maui.Essentials adapted for linux environments.
 
-Automatic Integration: Includes essentials.js, automatically copied to your wwwroot folder during build.
-
 MIT Licensed: Freely use, modify, and distribute under the permissive MIT License.
 
 # Getting Started
@@ -54,7 +52,7 @@ OR
         => AppBuilder.Configure<App>()
             .AfterSetup(builder =>
             {
-                LinuxEssentials.Configure("myappName", LinuxEssentials.GetLibCVExternPath("YourProject.Native.libcvextern.so"));
+                Microsoft.Maui.ApplicationModel.Platform.Initialize("myappName", LinuxEssentials.GetLibCVExternPath("YourProject.Native.libcvextern.so"));
             })
             .UsePlatformDetect()
             .WithInterFont()
@@ -68,7 +66,7 @@ OR
         => AppBuilder.Configure<App>()
             .AfterSetup(builder =>
             {
-                LinuxEssentials.Configure("myappName", LinuxEssentials.GetLibCVExternPath("YourProject.Native.libcvextern.so"));
+                Microsoft.Maui.ApplicationModel.Platform.Initialize("myappName", LinuxEssentials.GetLibCVExternPath("YourProject.Native.libcvextern.so"));
             })
             .UsePlatformDetect()
             .WithInterFont()

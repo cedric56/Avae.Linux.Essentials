@@ -48,7 +48,7 @@ namespace Microsoft.Maui.ApplicationModel.Communication
 		/// Provides the default implementation for static usage of this API.
 		/// </summary>
 		public static IContacts Default =>
-			defaultImplementation ??= new ContactsImplementation(GtkEssentials.AccountPicker);
+			defaultImplementation ??= new ContactsImplementation(Platform.AccountPicker);
 
 		internal static void SetDefault(IContacts? implementation) =>
 			defaultImplementation = implementation;

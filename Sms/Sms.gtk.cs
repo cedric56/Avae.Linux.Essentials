@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.Essentials;
+using System.Diagnostics;
 
 namespace Microsoft.Maui.ApplicationModel.Communication
 {
@@ -14,19 +15,7 @@ namespace Microsoft.Maui.ApplicationModel.Communication
                 uri += "?&body=" + Uri.EscapeDataString(message.Body);
             try
             {
-                // Use xdg-open to open the sms URL with the default application
-                using var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "xdg-open",
-                        Arguments = uri,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
+                ProcessHelper.XDG_OPEN(uri);
             }
             catch (Exception ex)
             {

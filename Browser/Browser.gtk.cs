@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.Essentials;
+using System.Diagnostics;
 
 namespace Microsoft.Maui.ApplicationModel
 {
@@ -8,12 +9,9 @@ namespace Microsoft.Maui.ApplicationModel
         {
             bool isSuccessful = false;
 
-            Process process = new Process();
-
             try
             {
-                process.StartInfo = new ProcessStartInfo("xdg-open", uri.OriginalString);
-                isSuccessful = process.Start();
+                isSuccessful = ProcessHelper.XDG_OPEN(uri.OriginalString);
             }
             catch
             {

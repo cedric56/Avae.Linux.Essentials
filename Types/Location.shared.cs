@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Maui.Media;
 
 namespace Microsoft.Maui.Devices.Sensors

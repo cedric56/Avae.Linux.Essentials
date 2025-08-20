@@ -1,49 +1,24 @@
 ﻿using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Microsoft.Maui.Essentials
 {
     public static class ProcessHelper
     {
-        public static async Task<(int exitcode, string error, string result)> ExecuteProcess(string filename, string? arguments = null!)
+        public static bool XDG_OPEN(string arguments)
         {
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = filename,
+                    FileName = "xdg-open",
                     Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
             };
 
-            if (!process.Start())
-                return (1, "Failed to execute process", string.Empty);
-
-            // Read output and error streams in parallel to avoid deadlocks
-            var outputTask = process.StandardOutput.ReadToEndAsync();
-            var errorTask = process.StandardError.ReadToEndAsync();
-
-            await process.WaitForExitAsync();
-            await Task.WhenAny(outputTask, errorTask);
-
-            var output = await outputTask;
-            var error = await errorTask;
-
-            if (process.ExitCode != 0)
-            {
-                Console.WriteLine(error);
-            }
-
-            return (process.ExitCode, error, output);
-        }
-
-        public static async Task<bool> IsProgramInstalled(string command)
-        {
-            var response = await ExecuteProcess("which", command);
-            return !string.IsNullOrWhiteSpace(response.result);
+            return process.Start();
         }
     }
 }

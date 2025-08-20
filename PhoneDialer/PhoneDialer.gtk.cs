@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Maui.Essentials;
+using System.Diagnostics;
 
 namespace Microsoft.Maui.ApplicationModel.Communication
 {
@@ -10,20 +11,7 @@ namespace Microsoft.Maui.ApplicationModel.Communication
         {
             try
             {
-                // Use xdg-open to open the tel URL with the default application
-                using var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "xdg-open",
-                        Arguments = $"tel:{number}",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-                //process.WaitForExit();
+                ProcessHelper.XDG_OPEN($"tel:{number}");
             }
             catch (Exception ex)
             {

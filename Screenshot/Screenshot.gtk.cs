@@ -1,6 +1,7 @@
 ﻿using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Essentials;
 
 namespace Microsoft.Maui.Media
 {
@@ -11,8 +12,7 @@ namespace Microsoft.Maui.Media
 
         public Task<IScreenshotResult> CaptureAsync()
         {
-            var view = Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-            IScreenshotResult result = new ScreenshotResult(view.MainWindow);
+            IScreenshotResult result = new ScreenshotResult(WindowStateManager.Default.GetActiveWindow(false));
             return Task.FromResult(result);
         }
 

@@ -85,7 +85,7 @@ namespace Microsoft.Maui.ApplicationModel.DataTransfer
 		/// Provides the default implementation for static usage of this API.
 		/// </summary>
 		public static IShare Default =>
-			defaultImplementation ??= new ShareImplementation(GtkEssentials.SharePicker);
+			defaultImplementation ??= new ShareImplementation(Platform.SharePicker);
 
 		internal static void SetDefault(IShare? implementation) =>
 			defaultImplementation = implementation;

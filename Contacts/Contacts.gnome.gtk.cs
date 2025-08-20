@@ -82,7 +82,7 @@ namespace Microsoft.Maui.ApplicationModel.Communication
 					{
 						if (dictionary.Count > 1)
 						{
-							var account = await AccountPicker.PickAccountAsync(dictionary.Keys);
+							var account = await AccountPicker.PickAccountAsync(dictionary.Keys.Select(k => new AddressBook("Evolution", k)));
 							if (account != null && dictionary.ContainsKey(account))
 							{
 								return dictionary[account];

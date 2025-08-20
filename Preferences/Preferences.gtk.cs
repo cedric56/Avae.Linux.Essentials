@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Essentials;
+﻿using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Essentials;
 using Newtonsoft.Json;
 using System.Text.Json;
 
@@ -10,7 +11,7 @@ namespace Microsoft.Maui.Storage
 
         public PreferencesImplementation()
         {
-            string configDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", GtkEssentials.AppName ?? "MyApp");
+            string configDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", Platform.AppName ?? "MyApp");
             preferencesFilePath = Path.Combine(configDir, "preferences.json");
 
             // Ensure the directory exists

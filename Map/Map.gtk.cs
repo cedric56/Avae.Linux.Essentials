@@ -1,5 +1,5 @@
 ﻿using Microsoft.Maui.Devices.Sensors;
-using System.Diagnostics;
+using Microsoft.Maui.Essentials;
 
 namespace Microsoft.Maui.ApplicationModel
 {
@@ -7,7 +7,7 @@ namespace Microsoft.Maui.ApplicationModel
     {
         private void OpenUrl(string url)
         {
-            Process.Start("xdg-open", url);      
+            ProcessHelper.XDG_OPEN(url);
         }
 
         public Task OpenAsync(Placemark placemark, MapLaunchOptions options)
