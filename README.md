@@ -45,25 +45,13 @@ OR
  sudo apt install geoclue-2.0 -y
 ````
 
-3. Enable Preferences, set the name of the folder 
+3. Enable MediaPicker, you must have libcvextern.so. Consider is in an Native folder
 
 ````
  using Microsoft.Maui.ApplicationModel;
  public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
-            .UseMauiEssentials("myappName", "YourProject.Native.libcvextern.so")
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
-````
-
-4. Enable MediaPicker, you must have libcvextern.so. Consider is in an Native folder
-
-````
- using Microsoft.Maui.ApplicationModel;
- public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UseMauiEssentials("myappName", "YourProject.Native.libcvextern.so")
+            .UseMauiEssentials("YourProject.Native.libcvextern.so")
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

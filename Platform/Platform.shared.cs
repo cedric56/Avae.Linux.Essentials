@@ -9,7 +9,6 @@ namespace Microsoft.Maui.ApplicationModel
 {
     public static class Platform
     {
-        internal static string AppName { get; private set; }
         internal static string LibcvexternPath { get; private set; }
         internal static ICapturePicker? CapturePicker { get; private set; }
         internal static IAccountPicker? AccountPicker { get; private set; }
@@ -18,7 +17,16 @@ namespace Microsoft.Maui.ApplicationModel
 
         static List<Window> _windows = new List<Window>();
 
-        public static AppBuilder UseMauiEssentials(this AppBuilder builder, string appName, string libcvexternPath = null, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="libcvexternPath">YourProject.PathToLib.libcvextern.so</param>
+        /// <param name="accountPicker">if you want to redefine accountPicker</param>
+        /// <param name="capturePicker">if you want to redefine capturePicker</param>
+        /// <param name="sharePicker">if you want to redefine sharePicker</param>
+        /// <returns></returns>
+        public static AppBuilder UseMauiEssentials(this AppBuilder builder, string libcvexternPath = null, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
         {
             GLib.ExceptionManager.UnhandledException += (e) =>
             {
@@ -26,7 +34,6 @@ namespace Microsoft.Maui.ApplicationModel
                 Console.WriteLine($"Unhandled exception: {e.ExceptionObject}");
             };
 
-            AppName = appName;
             LibcvexternPath = GetLibCVExternPath(libcvexternPath);
             AccountPicker = accountPicker;
             CapturePicker = capturePicker;
