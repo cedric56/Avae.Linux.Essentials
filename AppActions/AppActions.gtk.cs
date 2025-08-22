@@ -22,7 +22,7 @@ namespace Microsoft.Maui.ApplicationModel
             _actions = actions;
             var name = Assembly.GetEntryAssembly()?.GetName().Name;
             var dll = Assembly.GetEntryAssembly()?.Location;
-            var dotnet = InstallPath();
+            var dotnet = InstallPath().Replace("\n", string.Empty);
 
             if (string.IsNullOrWhiteSpace(dotnet))
                 throw new Exception("Unable to find installed dotnet path");
