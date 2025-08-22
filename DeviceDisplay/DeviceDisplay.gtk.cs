@@ -173,19 +173,17 @@ namespace Microsoft.Maui.Devices
 
             private void CheckScreenChange(object sender, ElapsedEventArgs e)
             {
-                // Ensure we're on the GTK thread (required for GDK calls)
-                MainThread.BeginInvokeOnMainThread(() =>
+                var window = WindowStateManager.Default.GetActiveWindow(false);
+                if (window != null)
                 {
-                    var _gtkWindow = WindowStateManager.Default.GetActiveWindow(false);
-                    // Find the monitor containing the window's top-left corner
                     int currentMonitorIndex = -1;
                     for (int i = 0; i < _monitors.Count(); i++)
                     {
                         var monitor = _monitors.ElementAt(i);
                         var geometry = monitor.Geometry;
 
-                        if (_gtkWindow.Position.X >= geometry.X && _gtkWindow.Position.X < geometry.X + geometry.Width &&
-                            _gtkWindow.Position.Y >= geometry.Y && _gtkWindow.Position.Y < geometry.Y + geometry.Height)
+                        if (window.Position.X >= geometry.X && window.Position.X < geometry.X + geometry.Width &&
+                            window.Position.Y >= geometry.Y && window.Position.Y < geometry.Y + geometry.Height)
                         {
                             currentMonitorIndex = i;
                             break;
@@ -197,7 +195,7 @@ namespace Microsoft.Maui.Devices
                         ScreenChanged?.Invoke(this, currentMonitorIndex);
                         _lastMonitorIndex = currentMonitorIndex;
                     }
-                });
+                }
             }
         }
     }

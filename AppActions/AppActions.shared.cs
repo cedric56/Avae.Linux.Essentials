@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Microsoft.Maui.ApplicationModel
 {
 	/// <summary>
@@ -39,34 +35,12 @@ namespace Microsoft.Maui.ApplicationModel
 	/// </summary>
 	public interface IPlatformAppActions
 	{
-#if WINDOWS
-		/// <summary>
-		/// The lifecycle event that is triggered when this app is launched.
-		/// </summary>
-		/// <param name="e">Event arguments containing information about the launch of the application.</param>
-		/// <returns>A <see cref="Task"/> object with the current status of the asynchronous operation.</returns>
-		Task OnLaunched(UI.Xaml.LaunchActivatedEventArgs e);
-#elif IOS || MACCATALYST
-		/// <summary>
-		/// The lifecycle event that is triggered when this app is launched.
-		/// </summary>
-		/// <param name="application">The <see cref="UIKit.UIApplication"/> instance this action is performed for.</param>
-		/// <param name="shortcutItem">The shortcut item that was chosen from the app icon.</param>
-		/// <param name="completionHandler">The completion handler that is triggered when this action has completed.</param>
-		void PerformActionForShortcutItem(UIKit.UIApplication application, UIKit.UIApplicationShortcutItem shortcutItem, UIKit.UIOperationHandler completionHandler);
-#elif ANDROID
-		/// <summary>
-		/// The lifecycle event that is triggered when this app is launched.
-		/// </summary>
-		/// <param name="intent">The provided <see cref="Android.Content.Intent"/> to launch this app with.</param>
-		void OnNewIntent(Android.Content.Intent? intent);
-
-		/// <summary>
-		/// The lifecycle event that is triggered when this app is launched.
-		/// </summary>
-		/// <param name="intent">The provided <see cref="Android.Content.Intent"/> to resume this app with.</param>
-		void OnResume(Android.Content.Intent? intent);
-#endif
+			/// <summary>
+			/// The lifecycle event that is triggered when this app is launched.
+			/// </summary>
+			/// <param name="e">Event arguments containing information about the launch of the application.</param>
+			/// <returns>A <see cref="Task"/> object with the current status of the asynchronous operation.</returns>
+			Task OnLaunched(AppAction a);
 	}
 
 	/// <summary>
@@ -137,42 +111,14 @@ namespace Microsoft.Maui.ApplicationModel
 			return platform;
 		}
 
-#if WINDOWS
 		/// <summary>
 		/// The lifecycle event that is triggered when this app is launched.
 		/// </summary>
 		/// <param name="appActions">Instance of the <see cref="IAppActions"/> object this event is invoked on.</param>
 		/// <param name="e">Event arguments containing information about the launch of the application.</param>
 		/// <returns>A <see cref="Task"/> object with the current status of the asynchronous operation.</returns>
-		public static Task OnLaunched(this IAppActions appActions, UI.Xaml.LaunchActivatedEventArgs e) =>
+		public static Task OnLaunched(this IAppActions appActions, AppAction e) =>
 			appActions.AsPlatform().OnLaunched(e);
-#elif IOS || MACCATALYST
-		/// <summary>
-		/// The lifecycle event that is triggered when this app is launched.
-		/// </summary>
-		/// <param name="appActions">Instance of the <see cref="IAppActions"/> object this event is invoked on.</param>
-		/// <param name="application">The <see cref="UIKit.UIApplication"/> instance this action is performed for.</param>
-		/// <param name="shortcutItem">The shortcut item that was chosen from the app icon.</param>
-		/// <param name="completionHandler">The completion handler that is triggered when this action has completed.</param>
-		public static void PerformActionForShortcutItem(this IAppActions appActions, UIKit.UIApplication application, UIKit.UIApplicationShortcutItem shortcutItem, UIKit.UIOperationHandler completionHandler) =>
-			appActions.AsPlatform().PerformActionForShortcutItem(application, shortcutItem, completionHandler);
-#elif ANDROID
-		/// <summary>
-		/// The lifecycle event that is triggered when this app is launched.
-		/// </summary>
-		/// <param name="appActions">Instance of the <see cref="IAppActions"/> object this event is invoked on.</param>
-		/// <param name="intent">The provided <see cref="Android.Content.Intent"/> to launch this app with.</param>
-		public static void OnNewIntent(this IAppActions appActions, Android.Content.Intent? intent) =>
-			appActions.AsPlatform().OnNewIntent(intent);
-
-		/// <summary>
-		/// The lifecycle event that is triggered when this app is launched.
-		/// </summary>
-		/// <param name="appActions">Instance of the <see cref="IAppActions"/> object this event is invoked on.</param>
-		/// <param name="intent">The provided <see cref="Android.Content.Intent"/> to resume this app with.</param>
-		public static void OnResume(this IAppActions appActions, Android.Content.Intent? intent) =>
-			appActions.AsPlatform().OnResume(intent);
-#endif
 	}
 
 	/// <summary>

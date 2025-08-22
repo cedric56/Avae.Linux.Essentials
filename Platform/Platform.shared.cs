@@ -1,9 +1,13 @@
-﻿using Avalonia;
+﻿using System.Diagnostics;
+using System.IO.Pipes;
+using Avalonia;
 using Avalonia.Controls;
 using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Media;
 using System.Reflection;
+using System.Text;
+using System.Runtime;
 
 namespace Microsoft.Maui.ApplicationModel
 {
@@ -17,6 +21,57 @@ namespace Microsoft.Maui.ApplicationModel
 
         static List<Window> _windows = new List<Window>();
 
+        private static void Patch()
+        {
+            var proc = Process.GetCurrentProcess();
+            Process[] processes = Process.GetProcessesByName(proc.ProcessName);
+
+            if (processes.Length > 1)
+            {
+                //iterate through all running target applications      
+                foreach (Process p in processes)
+                {
+                    if (p.Id != proc.Id)
+                    {
+                        var args = Environment.GetCommandLineArgs();
+                        var arg = args.FirstOrDefault(a => a.StartsWith($"{AppActionsExtensions.AppActionPrefix}"));
+                        if (arg != null)
+                        {
+                            using var client = new NamedPipeClientStream(".", "mypipe", PipeDirection.Out);
+                            client.Connect();
+                            byte[] message = Encoding.UTF8.GetBytes(arg);
+                            client.Write(message, 0, message.Length);
+                            Environment.Exit(0);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void Register()
+        {
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    using var server = new NamedPipeServerStream("mypipe", PipeDirection.InOut);
+                    server.WaitForConnection();
+
+                    byte[] buffer = new byte[256];
+                    int bytesRead = server.Read(buffer, 0, buffer.Length);
+                    var a = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    var id = AppActionsExtensions.ArgumentsToId(a);
+                    var actions = await AppActions.GetAsync();
+                    var action = actions.FirstOrDefault(a => a.Id == id);
+                    if (action != null)
+                    {
+                        OnLaunched(action);
+                    }
+                }
+            });
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -28,6 +83,9 @@ namespace Microsoft.Maui.ApplicationModel
         /// <returns></returns>
         public static AppBuilder UseMauiEssentials(this AppBuilder builder, string libcvexternPath = null, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
         {
+            Patch();
+            Register();            
+            
             GLib.ExceptionManager.UnhandledException += (e) =>
             {
                 // Handle unhandled exceptions globally
@@ -85,6 +143,9 @@ namespace Microsoft.Maui.ApplicationModel
             }
             return tempPath;
         }
+        
+        public static void OnLaunched(AppAction a) =>
+            AppActions.Current.OnLaunched(a);
 
         public static void OnActivated(Avalonia.Controls.Window window) =>
         WindowStateManager.Default.OnActivated(window);
