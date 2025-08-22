@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using Task = System.Threading.Tasks.Task;
 
@@ -21,13 +22,18 @@ namespace Microsoft.Maui.ApplicationModel
             _actions = actions;
             var name = Assembly.GetEntryAssembly()?.GetName().Name;
             var dll = Assembly.GetEntryAssembly()?.Location;
+            var dotnet = InstallPath();
+
+            if (string.IsNullOrWhiteSpace(dotnet))
+                throw new Exception("Unable to find installed dotnet path");
+
             string desktopFile = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             $".local/share/applications/{name}.desktop");
 
             string content = $@"[Desktop Entry]
 Name={name}
-Exec=/usr/bin/dotnet {dll}
+Exec={dotnet} {dll}
 Icon=myapp
 Type=Application
 Categories=Utility;
@@ -40,7 +46,7 @@ Actions={string.Join(";", actions.Select(a => a.Title))};";
 
 [Desktop Action {action.Title}]
 Name={action.Title}
-Exec=/usr/bin/dotnet {dll} ""{AppActionsExtensions.AppActionPrefix + encodedArg}""";
+Exec={dotnet} {dll} ""{AppActionsExtensions.AppActionPrefix + encodedArg}""";
                 //--OnlyShowIn=Unity;GNOME;KDE;";
             }
 
@@ -53,6 +59,23 @@ Exec=/usr/bin/dotnet {dll} ""{AppActionsExtensions.AppActionPrefix + encodedArg}
             // Make it executable
             System.Diagnostics.Process.Start("chmod", $"+x {desktopFile}");
             return Task.CompletedTask;
+        }
+
+        private string InstallPath()
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "which",
+                Arguments = "dotnet",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(psi);
+            string output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return output;
         }
 
         public Task OnLaunched(AppAction a)
