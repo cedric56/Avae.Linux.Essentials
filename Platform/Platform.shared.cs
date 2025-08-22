@@ -51,7 +51,7 @@ namespace Microsoft.Maui.ApplicationModel
 
         private static void Register()
         {
-            Task.Run(async () =>
+            var thread = new Thread(async () =>
             {
                 while (true)
                 {
@@ -70,6 +70,8 @@ namespace Microsoft.Maui.ApplicationModel
                     }
                 }
             });
+
+            thread.Start();
         }
 
         /// <summary>
