@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Essentials;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Reflection;
 using System.Text.Json;
 

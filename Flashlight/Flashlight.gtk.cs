@@ -1,22 +1,41 @@
-﻿using Microsoft.Maui.ApplicationModel;
-
-namespace Microsoft.Maui.Devices
+﻿namespace Microsoft.Maui.Devices
 {
     class FlashlightImplementation : IFlashlight
     {
+        private readonly string? _ledPath;
+
+        public FlashlightImplementation()
+        {
+            var names = new string[] { "torch", "led0", "led1" };
+            foreach(var name in  names)
+            {
+                var path = Path.Combine("/sys/class/leds", name, "brightness");
+                if (File.Exists(path))
+                {
+                    _ledPath = path;
+                    break;
+                }
+            }
+        }
+
         public Task<bool> IsSupportedAsync()
         {
-            return Task.FromResult(false);
+            return Task.FromResult(File.Exists(_ledPath));
         }
 
-        public Task TurnOffAsync()
+        public async Task TurnOffAsync()
         {
-            throw ExceptionUtils.NotSupportedOrImplementedException;
+            if (!await IsSupportedAsync()) 
+                return;
+
+            File.WriteAllText(_ledPath!, "1");
         }
 
-        public Task TurnOnAsync()
+        public async Task TurnOnAsync()
         {
-            throw ExceptionUtils.NotSupportedOrImplementedException;
+            if (!await IsSupportedAsync()) 
+                return;
+            File.WriteAllText(_ledPath!, "0");
         }
     }
 }
