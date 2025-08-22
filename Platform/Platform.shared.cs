@@ -49,29 +49,24 @@ namespace Microsoft.Maui.ApplicationModel
             }
         }
 
-        private static void Register()
+        private async static void Register()
         {
-            var thread = new Thread(async () =>
+            while (true)
             {
-                while (true)
+                using var server = new NamedPipeServerStream("mypipe", PipeDirection.InOut);
+                server.WaitForConnection();
+
+                byte[] buffer = new byte[256];
+                int bytesRead = server.Read(buffer, 0, buffer.Length);
+                var a = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                var id = AppActionsExtensions.ArgumentsToId(a);
+                var actions = await AppActions.GetAsync();
+                var action = actions.FirstOrDefault(a => a.Id == id);
+                if (action != null)
                 {
-                    using var server = new NamedPipeServerStream("mypipe", PipeDirection.InOut);
-                    server.WaitForConnection();
-
-                    byte[] buffer = new byte[256];
-                    int bytesRead = server.Read(buffer, 0, buffer.Length);
-                    var a = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    var id = AppActionsExtensions.ArgumentsToId(a);
-                    var actions = await AppActions.GetAsync();
-                    var action = actions.FirstOrDefault(a => a.Id == id);
-                    if (action != null)
-                    {
-                        OnLaunched(action);
-                    }
+                    OnLaunched(action);
                 }
-            });
-
-            thread.Start();
+            }
         }
 
         /// <summary>
@@ -84,9 +79,11 @@ namespace Microsoft.Maui.ApplicationModel
         /// <param name="sharePicker">if you want to redefine sharePicker</param>
         /// <returns></returns>
         public static AppBuilder UseMauiEssentials(this AppBuilder builder, string libcvexternPath = null, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
-        {
+        {            
             Patch();
-            Register();            
+
+            var thread = new Thread(Register);
+            thread.Start();        
             
             GLib.ExceptionManager.UnhandledException += (e) =>
             {
