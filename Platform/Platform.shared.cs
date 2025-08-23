@@ -133,7 +133,7 @@ namespace Microsoft.Maui.ApplicationModel
                 return string.Empty;
 
             string tempPath = Path.Combine(Path.GetTempPath(), "libcvextern.so");
-            using var stream = Assembly.GetCallingAssembly().GetManifestResourceStream(embeddedRessourcePath);// "Microsoft.Maui.Essentials.Native.libcvextern.so");
+            using var stream = Assembly.GetEntryAssembly()?.GetManifestResourceStream(embeddedRessourcePath);
             if (stream is null)
                 throw new Exception("Enable to find embedded ressource");
             using (var fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
