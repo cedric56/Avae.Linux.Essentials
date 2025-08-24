@@ -10,15 +10,18 @@
 
         public OrientationSensorImplementation()
         {
-            // Try to find an iio device with accel
-            foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
+            if (Directory.Exists("/sys/bus/iio/devices/"))
             {
-                if (File.Exists(Path.Combine(dir, "in_rotvec_x_raw")) &&
-            File.Exists(Path.Combine(dir, "in_rotvec_y_raw")) &&
-            File.Exists(Path.Combine(dir, "in_rotvec_z_raw")))
+                // Try to find an iio device with accel
+                foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
                 {
-                    _devicePath = dir;
-                    break;
+                    if (File.Exists(Path.Combine(dir, "in_rotvec_x_raw")) &&
+                File.Exists(Path.Combine(dir, "in_rotvec_y_raw")) &&
+                File.Exists(Path.Combine(dir, "in_rotvec_z_raw")))
+                    {
+                        _devicePath = dir;
+                        break;
+                    }
                 }
             }
         }

@@ -11,13 +11,16 @@ namespace Microsoft.Maui.Devices.Sensors
 
         public AccelerometerImplementation()
         {
-            // Try to find an iio device with accel
-            foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
+            if (Directory.Exists("/sys/bus/iio/devices/"))
             {
-                if (File.Exists(Path.Combine(dir, "in_accel_x_raw")))
+                // Try to find an iio device with accel
+                foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
                 {
-                    _devicePath = dir;
-                    break;
+                    if (File.Exists(Path.Combine(dir, "in_accel_x_raw")))
+                    {
+                        _devicePath = dir;
+                        break;
+                    }
                 }
             }
         }
