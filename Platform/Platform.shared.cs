@@ -1,13 +1,16 @@
-﻿using System.Diagnostics;
-using System.IO.Pipes;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Maui.ApplicationModel.Communication;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
+using Microsoft.Maui.Devices;
 using Microsoft.Maui.Media;
+using Microsoft.Maui.Storage;
+using System.Diagnostics;
+using System.IO.Pipes;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Runtime;
 
 namespace Microsoft.Maui.ApplicationModel
 {
@@ -49,23 +52,30 @@ namespace Microsoft.Maui.ApplicationModel
             }
         }
 
-        private async static void Register()
+        private async static void Register(CancellationToken token)
         {
-            while (true)
+            try
             {
-                using var server = new NamedPipeServerStream("mypipe", PipeDirection.InOut);
-                server.WaitForConnection();
-
-                byte[] buffer = new byte[256];
-                int bytesRead = server.Read(buffer, 0, buffer.Length);
-                var a = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                var id = AppActionsExtensions.ArgumentsToId(a);
-                var actions = await AppActions.GetAsync();
-                var action = actions.FirstOrDefault(a => a.Id == id);
-                if (action != null)
+                while (true)
                 {
-                    OnLaunched(action);
+                    using var server = new NamedPipeServerStream("mypipe", PipeDirection.InOut);
+                    await server.WaitForConnectionAsync(token);
+
+                    byte[] buffer = new byte[256];
+                    int bytesRead = server.Read(buffer, 0, buffer.Length);
+                    var a = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    var id = AppActionsExtensions.ArgumentsToId(a);
+                    var actions = await AppActions.GetAsync();
+                    var action = actions.FirstOrDefault(a => a.Id == id);
+                    if (action != null)
+                    {
+                        OnLaunched(action);
+                    }
                 }
+            }
+            catch(OperationCanceledException)
+            {
+
             }
         }
 
@@ -78,20 +88,32 @@ namespace Microsoft.Maui.ApplicationModel
         /// <param name="capturePicker">if you want to redefine capturePicker</param>
         /// <param name="sharePicker">if you want to redefine sharePicker</param>
         /// <returns></returns>
-        public static AppBuilder UseMauiEssentials(this AppBuilder builder, string libcvexternPath = null, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
+        public static AppBuilder UseMauiEssentials(this AppBuilder builder, Func<Architecture, string> getLibcvexternPath = null, IAccountPicker? accountPicker = null, ICapturePicker? capturePicker = null, ISharePicker? sharePicker = null)
         {            
             Patch();
 
-            var thread = new Thread(Register);
-            thread.Start();        
+            var cts = new CancellationTokenSource();
+            var thread = new Thread(() => Register(cts.Token));
+            thread.Start();
+
+            builder.AfterSetup(b =>
+            {
+                if (b.Instance is IClassicDesktopStyleApplicationLifetime desktop)
+                    desktop.Exit += (sender, e) =>
+                    {
+                        cts.Cancel();
+                    };
+            });
+
             
+
             GLib.ExceptionManager.UnhandledException += (e) =>
             {
                 // Handle unhandled exceptions globally
                 Console.WriteLine($"Unhandled exception: {e.ExceptionObject}");
             };
 
-            LibcvexternPath = GetLibCVExternPath(libcvexternPath);
+            LibcvexternPath = GetLibCVExternPath(getLibcvexternPath);
             AccountPicker = accountPicker;
             CapturePicker = capturePicker;
             SharePicker = sharePicker;
@@ -127,20 +149,29 @@ namespace Microsoft.Maui.ApplicationModel
         /// <param name="embeddedRessourcePath">YourProject.PathToLib.libcvextern.so</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static string GetLibCVExternPath(string embeddedRessourcePath)
+        public static string GetLibCVExternPath(Func<Architecture, string> getEmbeddedRessourcePath)
         {
-            if (string.IsNullOrWhiteSpace(embeddedRessourcePath))
-                return string.Empty;
-
-            string tempPath = Path.Combine(Path.GetTempPath(), "libcvextern.so");
-            using var stream = Assembly.GetEntryAssembly()?.GetManifestResourceStream(embeddedRessourcePath);
-            if (stream is null)
-                throw new Exception("Enable to find embedded ressource");
-            using (var fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+            if (getEmbeddedRessourcePath is not null)
             {
-                stream?.CopyTo(fs);
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly != null)
+                {
+                    if (DeviceInfo.Current is DeviceInfoImplementation implementation)
+                    {
+                        string tempPath = Path.Combine(FileSystem.AppDataDirectory, "libcvextern.so");
+                        using var stream = assembly.GetManifestResourceStream(getEmbeddedRessourcePath(implementation.Architecture));
+                        if (stream is null)
+                            throw new Exception("Enable to find embedded ressource");
+                        using (var fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+                        {
+                            stream?.CopyTo(fs);
+                        }
+                        return tempPath;
+                    }                    
+                }
             }
-            return tempPath;
+
+            return string.Empty;
         }
         
         public static void OnLaunched(AppAction a) =>

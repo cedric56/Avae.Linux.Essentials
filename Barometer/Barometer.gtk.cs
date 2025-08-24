@@ -11,22 +11,18 @@ namespace Microsoft.Maui.Devices.Sensors
 
         public BarometerImplementation()
         {
-            if (IsSupported)
+            // Try to find an iio device with accel
+            foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
             {
-                // Try to find an iio device with accel
-                foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
+                if (File.Exists(Path.Combine(dir, "in_pressure_raw")))
                 {
-                    if (File.Exists(Path.Combine(dir, "in_pressure_raw")))
-                    {
-                        _devicePath = dir;
-                        break;
-                    }
+                    _devicePath = dir;
+                    break;
                 }
             }
         }
 
-        public bool IsSupported =>
-            Directory.Exists("/sys/bus/iio/devices/");
+        public bool IsSupported => _devicePath is not null;
 
         void PlatformStart(SensorSpeed sensorSpeed)
         {
@@ -37,10 +33,17 @@ namespace Microsoft.Maui.Devices.Sensors
             _pollingTask = Task.Run(() => PollingLoop(sensorSpeed, _cts.Token));
         }
 
-        void PlatformStop()
+        async void PlatformStop()
         {
             _cts?.Cancel();
-            _pollingTask?.Wait();
+            if (_pollingTask != null)
+            {
+                try
+                {
+                    await _pollingTask;
+                }
+                catch (OperationCanceledException) { }
+            }
         }
 
         private void PollingLoop(SensorSpeed sensorSpeed, CancellationToken token)

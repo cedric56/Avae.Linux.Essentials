@@ -51,7 +51,7 @@ OR
  using Microsoft.Maui.ApplicationModel;
  public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
-            .UseMauiEssentials("YourProject.Native.libcvextern.so")
+            .UseMauiEssentials((architecture) => "YourProject.Native.libcvextern.so")
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

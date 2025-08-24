@@ -12,24 +12,20 @@ namespace Microsoft.Maui.Devices.Sensors
 
         public GyroscopeImplementation()
         {
-            if (IsSupported)
+            // Try to find an iio device with accel
+            foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
             {
-                // Try to find an iio device with accel
-                foreach (var dir in Directory.GetDirectories("/sys/bus/iio/devices/"))
+                if (File.Exists(Path.Combine(dir, "in_anglvel_x_raw")) &&
+            File.Exists(Path.Combine(dir, "in_anglvel_y_raw")) &&
+            File.Exists(Path.Combine(dir, "in_anglvel_z_raw")))
                 {
-                    if (File.Exists(Path.Combine(dir, "in_anglvel_x_raw")) &&
-                File.Exists(Path.Combine(dir, "in_anglvel_y_raw")) &&
-                File.Exists(Path.Combine(dir, "in_anglvel_z_raw")))
-                    {
-                        _devicePath = dir;
-                        break;
-                    }
+                    _devicePath = dir;
+                    break;
                 }
             }
         }
 
-        bool PlatformIsSupported =>
-            Directory.Exists("/sys/bus/iio/devices/");
+        bool PlatformIsSupported => _devicePath is not null;
 
         void PlatformStart(SensorSpeed sensorSpeed)
         {
@@ -40,10 +36,17 @@ namespace Microsoft.Maui.Devices.Sensors
             _pollingTask = Task.Run(() => PollingLoop(sensorSpeed, _cts.Token));
         }
 
-        void PlatformStop()
+        async void PlatformStop()
         {
             _cts?.Cancel();
-            _pollingTask?.Wait();
+            if (_pollingTask != null)
+            {
+                try
+                {
+                    await _pollingTask;
+                }
+                catch (OperationCanceledException) { }
+            }
         }
 
         private void PollingLoop(SensorSpeed sensorSpeed, CancellationToken token)

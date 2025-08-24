@@ -1,10 +1,33 @@
-﻿namespace Microsoft.Maui.Devices
+﻿using Avalonia.Controls;
+
+namespace Microsoft.Maui.Devices
 {
     public partial class BatteryImplementation : IBattery
     {
+        public BatteryImplementation()
+        {
+            if(Directory.Exists("/sys/class/power_supply"))
+            {
+                var directories = Directory.GetDirectories("/sys/class/power_supply");
+
+                foreach (var directory in directories)
+                {
+                    string normalizedPath = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    var name = Path.GetFileName(normalizedPath);
+                    if (name is not null)
+                    {
+                        if (name.ToUpper().StartsWith("BAT"))
+                        {
+                            BatteryPath = directory;
+                        }
+                    }
+                }
+            }
+        }
+
         public EnergySaverStatus EnergySaverStatus => EnergySaverStatus.Unknown;
 
-        private const string BatteryPath = "/sys/class/power_supply/";
+        private readonly string BatteryPath;
 
         public BatteryState State => GetBatteryState();
         public BatteryPowerSource PowerSource => GetPowerSource();
@@ -12,30 +35,38 @@
 
         private BatteryState GetBatteryState()
         {
-            var batteryStatusFilePath = Path.Combine(BatteryPath, "BAT0", "status");
-            if (!File.Exists(batteryStatusFilePath))
+            if (Directory.Exists(BatteryPath))
             {
-                return BatteryState.NotPresent;
+                var batteryStatusFilePath = Path.Combine(BatteryPath, "status");
+                if (!File.Exists(batteryStatusFilePath))
+                {
+                    return BatteryState.NotPresent;
+                }
+                Console.WriteLine(batteryStatusFilePath);
+                var batteryStatus = File.ReadAllText(batteryStatusFilePath).Trim().ToLower();
+                return batteryStatus switch
+                {
+                    "charging" => BatteryState.Charging,
+                    "discharging" => BatteryState.Discharging,
+                    "full" => BatteryState.Full,
+                    _ => BatteryState.Unknown,
+                };
             }
-
-            var batteryStatus = File.ReadAllText(batteryStatusFilePath).Trim().ToLower();
-            return batteryStatus switch
-            {
-                "charging" => BatteryState.Charging,
-                "discharging" => BatteryState.Discharging,
-                "full" => BatteryState.Full,
-                _ => BatteryState.Unknown,
-            };
+            return BatteryState.Full;
         }
 
         private BatteryPowerSource GetPowerSource()
         {
-            // Determine if the device is plugged in or on battery
-            var powerSupplyTypeFilePath = Path.Combine(BatteryPath, "BAT0", "type");
-            if (File.Exists(powerSupplyTypeFilePath))
+            if (Directory.Exists(BatteryPath))
             {
-                var type = File.ReadAllText(powerSupplyTypeFilePath).Trim().ToLower();
-                return type == "battery" ? BatteryPowerSource.Battery : BatteryPowerSource.AC;
+                // Determine if the device is plugged in or on battery
+                var powerSupplyTypeFilePath = Path.Combine(BatteryPath, "type");
+                if (File.Exists(powerSupplyTypeFilePath))
+                {
+                    Console.WriteLine(powerSupplyTypeFilePath);
+                    var type = File.ReadAllText(powerSupplyTypeFilePath).Trim().ToLower();
+                    return type == "battery" ? BatteryPowerSource.Battery : BatteryPowerSource.AC;
+                }
             }
 
             return BatteryPowerSource.AC;
@@ -43,15 +74,19 @@
 
         private double GetChargeLevel()
         {
-            var chargeLevelFilePath = Path.Combine(BatteryPath, "BAT0", "capacity");
-            if (!File.Exists(chargeLevelFilePath))
+            if (Directory.Exists(BatteryPath))
             {
-                return 1; // Unknown charge level
-            }
+                var chargeLevelFilePath = Path.Combine(BatteryPath, "capacity");
+                if (!File.Exists(chargeLevelFilePath))
+                {
+                    return 1; // Unknown charge level
+                }
 
-            if (int.TryParse(File.ReadAllText(chargeLevelFilePath).Trim(), out int chargeLevel))
-            {
-                return chargeLevel / 100.0;
+                Console.WriteLine(chargeLevelFilePath);
+                if (int.TryParse(File.ReadAllText(chargeLevelFilePath).Trim(), out int chargeLevel))
+                {
+                    return chargeLevel / 100.0;
+                }
             }
 
             return -1; // Invalid charge level
@@ -61,13 +96,16 @@
 
         void StartBatteryListeners()
         {
-            watcher = new FileSystemWatcher("/sys/class/power_supply/BAT0")
+            if (Directory.Exists(BatteryPath))
             {
-                NotifyFilter = NotifyFilters.LastWrite,
-                Filter = "status"
-            };
-            watcher.Changed += OnChanged;
-            watcher.EnableRaisingEvents = true;
+                watcher = new FileSystemWatcher(BatteryPath)
+                {
+                    NotifyFilter = NotifyFilters.LastWrite,
+                    Filter = "status"
+                };
+                watcher.Changed += OnChanged;
+                watcher.EnableRaisingEvents = true;
+            }
         }
 
         private void OnChanged(object sender, EventArgs args)
@@ -77,8 +115,11 @@
 
         void StopBatteryListeners()
         {
-            watcher.Changed -= OnChanged;
-            watcher.EnableRaisingEvents = false;
+            if (watcher is not null)
+            {
+                watcher.Changed -= OnChanged;
+                watcher.EnableRaisingEvents = false;
+            }
         }
 
         void StartEnergySaverListeners()

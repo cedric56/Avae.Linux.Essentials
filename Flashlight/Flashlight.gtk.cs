@@ -6,10 +6,10 @@
 
         public FlashlightImplementation()
         {
-            var names = new string[] { "torch", "led0", "led1" };
+            var names = Directory.Exists("/sys/class/leds") ? Directory.GetDirectories("/sys/class/leds") : [];
             foreach(var name in  names)
             {
-                var path = Path.Combine("/sys/class/leds", name, "brightness");
+                var path = Path.Combine(name, "brightness");
                 if (File.Exists(path))
                 {
                     _ledPath = path;

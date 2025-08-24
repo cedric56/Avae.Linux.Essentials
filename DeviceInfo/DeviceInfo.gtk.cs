@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Management;
+using System.Runtime.InteropServices;
 using Tmds.DBus.Protocol;
 using Tmds.DBus.SourceGenerator;
 
@@ -186,6 +187,14 @@ namespace Microsoft.Maui.Devices
         public Version Version { get; set; }
 
         public DevicePlatform Platform { get; set; }
+
+        public Architecture Architecture
+        {
+            get
+            {
+                return RuntimeInformation.ProcessArchitecture;
+            }
+        }
 
         public DeviceIdiom Idiom { get; set; }
 

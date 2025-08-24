@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Maui.Devices
+﻿using Microsoft.Maui.ApplicationModel;
+
+namespace Microsoft.Maui.Devices
 {
     partial class VibrationImplementation : IVibration
     {
@@ -33,15 +35,14 @@
         }
 
         void PlatformCancel()
-        {
-            if (!IsSupported) return;
+            {if (!IsSupported) return;
 
-            try
-            {
-                // Writing 0 usually cancels vibration
-                File.WriteAllText(_vibratorPath, "0");
-            }
-            catch { }
+        try
+        {
+            // Writing 0 usually cancels vibration
+            File.WriteAllText(_vibratorPath, "0");
+        }
+        catch { }
         }
     }
 }
