@@ -1,8 +1,3 @@
-> [!WARNING]
-> This repository will be merged into [`Avae.Essentials`](https://github.com/you/Avae.Essentials) as soon as [`Avalonia.Controls.Maui.Essentials`](https://github.com/AvaloniaUI/Avalonia.Controls.Maui.Essentials) and [`Maui.Labs.Essentials`](https://github.com/dotnet/maui-labs) are ready for browser.
->
-> Until then, `Avae.Linux.Essentials` remains the canonical source and will keep receiving fixes.
-
 # Avae.Linux.Essentials
 
 A port of Microsoft.Maui.Essentials tailored for Avalonia.Linux, bringing essential cross-platform APIs to your Avalonia-based linux applications. This package simplifies access to common device and application features.
